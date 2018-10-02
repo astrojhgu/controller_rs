@@ -20,8 +20,8 @@ pub enum AdcMsg{
 
 
 impl AdcMsg{
-    pub fn type_code(&self)->u8{
-        match &self{
+    pub fn msg_type_code(&self)->u8{
+        match self{
             &AdcMsg::Trig(..)=>0xf3,
             &AdcMsg::Cfg {..}=>0xf4,
             &AdcMsg::StartDaq=>0xf5,
