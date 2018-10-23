@@ -1,36 +1,50 @@
+use std::iter::FromIterator;
 use pcap::Capture;
 use pcap::Error;
 use pcap::Active;
-
+use ::msg::adc_msg::{AdcMsg};
 const UDP_HDR_LEN:usize=42;
+const MIN_PAYLOAD_LEN:usize=80;
+
 
 pub fn send_raw_buffer(cap:&mut Capture<Active>, msg_type:u8, buf: &[u8],  dst_mac:[u8;6], src_mac:[u8;6], mtu_len:usize)->Result<(), Error>{
     let buffer_header_len=6+6+2;//6*mac+6*mac+2*len
     if buf.is_empty(){
-        let mut sub_buf=vec![0_u8;1+buffer_header_len];
+        let mut sub_buf=vec![0_u8;1+buffer_header_len+MIN_PAYLOAD_LEN];
         sub_buf[0..6].copy_from_slice(&dst_mac);
         sub_buf[6..12].copy_from_slice(&src_mac);
-        let payload_len:u16=0;
+        let payload_len:u16=MIN_PAYLOAD_LEN as u16+1;
         sub_buf[12]=(payload_len>>8) as u8;
         sub_buf[13]=(payload_len&0xff) as u8;
         sub_buf[14]=msg_type;
+
         cap.sendpacket(&sub_buf[..])?
     }
     else{
         for x in buf.chunks(mtu_len-1){
-            let mut sub_buf=vec![0_u8;x.len()+1+buffer_header_len];
+            let mut payload=Vec::from_iter(x.iter().map(|x|{*x}));
+            while payload.len()<MIN_PAYLOAD_LEN{
+                payload.push(0);
+            }
+            let mut sub_buf=vec![0_u8;payload.len()+1+buffer_header_len];
             sub_buf[0..6].copy_from_slice(&dst_mac);
             sub_buf[6..12].copy_from_slice(&src_mac);
-            let payload_len=x.len()+1;
+            let payload_len=payload.len()+1;
             sub_buf[12]=(payload_len>>8) as u8;
             sub_buf[13]=(payload_len&0xff) as u8;
             sub_buf[14]=msg_type;
-            sub_buf[15..].copy_from_slice(x);
-            println!("{}", sub_buf.len());
+            sub_buf[15..].copy_from_slice(&payload);
+            println!("len={}", sub_buf.len());
             cap.sendpacket(&sub_buf[..])?
         }
     }
     Ok(())
+}
+
+pub fn send_adc_msg(cap:&mut Capture<Active>, msg:&AdcMsg, dst_mac:[u8;6], src_mac:[u8;6], mut_len:usize)->Result<(), Error>{
+    let msg_type=msg.msg_type_code();
+    let buffer=msg.get_raw_data();
+    send_raw_buffer(cap, msg_type, &buffer, dst_mac, src_mac, mut_len)
 }
 
 pub fn compose_udp_header(dst_mac:&[u8;6], src_mac:&[u8;6], dst_ip:&[u8;4], src_ip:&[u8;4], dst_port:u16, src_port:u16, payload_len:u16)->Vec<u8>{

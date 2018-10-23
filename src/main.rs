@@ -1,13 +1,14 @@
 extern crate controller_rs;
 extern crate pcap;
-use controller_rs::net::{send_raw_buffer, send_udp_buffer};
 use pcap::{Capture, Device};
+use controller_rs::net::{send_raw_buffer, send_udp_buffer, send_adc_msg};
+use controller_rs::msg::adc_msg;
 
 fn main() {
-    let aa=vec![0;6];
-    let mut cap=Capture::from_device(Device{name:"lo".to_string(), desc:None}).unwrap().open().unwrap();
-    //send_buffer(&mut cap, 0xfa, &aa, [0;6], [0;6], 1500);
-    send_udp_buffer(&mut cap, &aa[..], [0x11,0x22,0x33,0x44,0x55,0x66], [0x22,0x33,0x44,0x55,0x66,0x77],
-    [100,0,0,228],[100,0,0,100],1234,1234,1500);
-
+    let mut cap=Capture::from_device(Device{name:"enp0s20f0u1u4".to_string(), desc:None}).unwrap().open().unwrap();
+    //let msg=adc_msg::AdcMsg::Ctrl(adc_msg::CtrlParam::PreRst);
+    let msg=adc_msg::AdcMsg::Cfg {io_delay:[6,6,6,6],packet_gap:2000, counter_wait:639, trig_out_delay:5, counter_sync:10, optical_delay:15};
+    //let msg=adc_msg::AdcMsg::MasterRst;
+    //send_raw_buffer(&mut cap, )
+    send_adc_msg(&mut cap, &msg, [0x11, 0x22, 0x33, 0x44, 0x55, 0x66], [0x66,0x55,0x44,0x33,0x22,0x11], 1500);
 }
