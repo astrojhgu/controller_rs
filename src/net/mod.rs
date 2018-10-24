@@ -2,6 +2,7 @@ use std::iter::FromIterator;
 use pcap::Capture;
 use pcap::Error;
 use pcap::Active;
+use etherparse;
 use ::msg::adc_msg::{AdcMsg};
 const UDP_HDR_LEN:usize=42;
 const MIN_PAYLOAD_LEN:usize=80;
@@ -10,6 +11,7 @@ const MIN_PAYLOAD_LEN:usize=80;
 pub fn send_raw_buffer(cap:&mut Capture<Active>, msg_type:u8, buf: &[u8],  dst_mac:[u8;6], src_mac:[u8;6], mtu_len:usize)->Result<(), Error>{
     let buffer_header_len=6+6+2;//6*mac+6*mac+2*len
     if buf.is_empty(){
+
         let mut sub_buf=vec![0_u8;1+buffer_header_len+MIN_PAYLOAD_LEN];
         sub_buf[0..6].copy_from_slice(&dst_mac);
         sub_buf[6..12].copy_from_slice(&src_mac);
