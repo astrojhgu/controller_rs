@@ -7,3 +7,4 @@ authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
 pcap = "0.7.0"
 etherparse = '>=0.6'
 interfaces = '>=0.0.4'
+num-complex = "0.2.1"
