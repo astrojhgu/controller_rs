@@ -1,6 +1,7 @@
 use num_complex::Complex;
 
 const PORT_PER_BOARD: usize = 8;
+const NUM_CH:usize=2048;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum CtrlParam {
@@ -44,7 +45,7 @@ pub enum AdcMsg {
         truncation: u32,
     },
     PhaseFactor {
-        value: [Vec<Complex<i16>>; PORT_PER_BOARD],
+        value: Vec<Vec<Complex<i16>>>,
     },
     QueryState,
     XGbeId {
@@ -104,16 +105,14 @@ impl AdcMsg {
                 ((truncation >> 24) & 0x000000ff) as u8,
             ],
             &AdcMsg::PhaseFactor { ref value } => {
-                let data = value
-                    .iter()
-                    .fold(Vec::<i16>::new(), |mut a, b| {
-                        for p in b {
-                            a.push(p.im);
-                            a.push(p.re);
-                        }
-                        a
-                    }).into_boxed_slice();
-
+                let mut data=Vec::<i16>::new();
+                for i in 0..PORT_PER_BOARD{
+                    for j in 0..NUM_CH {
+                        data.push(value[i][j].im);
+                        data.push(value[i][j].re);
+                    }
+                }
+                let data=data.into_boxed_slice();
                 let cap = data.len() * 2;
                 unsafe { Vec::from_raw_parts(Box::into_raw(data) as *mut u8, cap, cap) }
             }
