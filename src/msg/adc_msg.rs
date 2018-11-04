@@ -5,7 +5,7 @@ const NUM_CH:usize=2048;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum CtrlParam {
-    Sync,
+    Synchronize,
     PreRst,
     StartFft,
     SwitchPhaseFactor,
@@ -15,7 +15,7 @@ pub enum CtrlParam {
 impl CtrlParam {
     pub fn param_code(&self) -> u8 {
         match self {
-            &CtrlParam::Sync => 0,
+            &CtrlParam::Synchronize => 0,
             &CtrlParam::PreRst => 1,
             &CtrlParam::StartFft => 2,
             &CtrlParam::SwitchPhaseFactor => 3,

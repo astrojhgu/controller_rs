@@ -1,4 +1,5 @@
 pub mod adc_msg;
+pub mod io;
 pub mod snap2_msg;
 
 pub fn swap_phase_factor(input: &[i16]) -> Vec<i16> {
