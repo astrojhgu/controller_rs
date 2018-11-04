@@ -1,10 +1,10 @@
-[package]
-name = "controller_rs"
-version = "0.1.0"
-authors = ["Gu Junhua <jhgu@nao.cas.cn>"]
-
 [dependencies]
-pcap = "0.7.0"
-etherparse = '>=0.6'
-interfaces = '>=0.0.4'
-num-complex = "0.2.1"
+etherparse = '0.7.0'
+interfaces = '0.0.4'
+num-complex = '0.2.1'
+pcap = '0.7.0'
+
+[package]
+authors = ['Gu Junhua <jhgu@nao.cas.cn>']
+name = 'controller_rs'
+version = '0.1.0'
