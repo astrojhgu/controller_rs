@@ -1,5 +1,9 @@
 use serde_yaml::{from_reader, from_str, Value};
-
+use pcap::{Capture, Active};
+use num_complex::Complex;
+use crate::msg::adc_msg::AdcMsg;
+use crate::msg::adc_msg::CtrlParam;
+use crate::net::send_adc_msg;
 pub const BOARD_NUM: usize = 16;
 pub const ADC_PER_BOARD: usize = 4;
 
@@ -98,4 +102,39 @@ impl BoardCfg {
             io_delay,
         }
     }
+
+    pub fn set_xgbid(&self, cap:&mut Capture<Active>, src_mac:[u8;6]){
+        for i in 0..BOARD_NUM{
+            let msg=AdcMsg::XGbeId {value:self.xgbid[i].clone()};
+            send_adc_msg(cap, &msg, self.mac[i].clone(), src_mac, 1500);
+        }
+    }
+
+    pub fn set_fft_param(&self, cap:&mut Capture<Active>, src_mac:[u8;6]){
+        for i in 0..BOARD_NUM{
+            let msg=AdcMsg::FftParam {fft_shift:self.fft_shift, truncation:self.truncation};
+            send_adc_msg(cap, &msg, self.mac[i].clone(), src_mac, 1500);
+        }
+    }
+
+    pub fn update_phase_factor1(&self, cap:&mut Capture<Active>, bid:usize, value:Vec<Vec<Complex<i16>>>, src_mac:[u8;6]){
+        let msg=AdcMsg::PhaseFactor {value};
+        send_adc_msg(cap, &msg, self.mac[bid].clone(), src_mac, 1500);
+    }
+
+    pub fn update_phase_factor(&self, cap:&mut Capture<Active>, value:Vec<Vec<Vec<Complex<i16>>>>, src_mac:[u8;6]){
+        self.set_xgbid(cap, src_mac.clone());
+        self.set_fft_param(cap, src_mac.clone());
+        assert_eq!(value.len(), BOARD_NUM);
+        for (bid, pf) in value.into_iter().enumerate(){
+            self.update_phase_factor1(cap, bid, pf, src_mac.clone());
+        }
+        for bid in 0..BOARD_NUM{
+            let msg=AdcMsg::Ctrl(CtrlParam::SwitchPhaseFactor);
+            send_adc_msg(cap, &msg, self.mac[bid].clone(), src_mac.clone(), 1500);
+        }
+        let msg=AdcMsg::MasterTrig;
+        send_adc_msg(cap, &msg, self.mac[self.master_board_id].clone(), src_mac.clone(), 1500);
+    }
 }
+
