@@ -1,10 +1,10 @@
 extern crate controller_rs;
-extern crate pcap;
 extern crate num_complex;
+extern crate pcap;
 
-use num_complex::Complex;
 use controller_rs::msg::adc_msg;
 use controller_rs::net::{send_adc_msg, send_raw_buffer, send_udp_buffer};
+use num_complex::Complex;
 use pcap::{Capture, Device};
 
 fn main() {
@@ -25,15 +25,17 @@ fn main() {
         optical_delay: 15,
     };
     */
-    let mut phase_phases=vec![Vec::<Complex<i16>>::new();8];
+    let mut phase_phases = vec![Vec::<Complex<i16>>::new(); 8];
 
-    for i in 0..8{
-        for j in 0..2048{
-            phase_phases[i].push(Complex::<i16>::new(1,0));
+    for i in 0..8 {
+        for j in 0..2048 {
+            phase_phases[i].push(Complex::<i16>::new(1, 0));
         }
     }
 
-    let msg=adc_msg::AdcMsg::PhaseFactor {value:phase_phases};
+    let msg = adc_msg::AdcMsg::PhaseFactor {
+        value: phase_phases,
+    };
 
     //let msg=adc_msg::AdcMsg::MasterRst;
     //send_raw_buffer(&mut cap, )
