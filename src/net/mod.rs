@@ -1,3 +1,4 @@
+ #![allow(unused_imports)]
 use etherparse;
 use msg::adc_msg::AdcMsg;
 use pcap::Active;

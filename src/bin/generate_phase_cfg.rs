@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 extern crate controller_rs;
 extern crate serde_yaml;
 

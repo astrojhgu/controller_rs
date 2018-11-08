@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 extern crate controller_rs;
 extern crate num_complex;
 extern crate pcap;
@@ -28,7 +30,7 @@ fn main() {
     let mut phase_phases = vec![Vec::<Complex<i16>>::new(); 8];
 
     for i in 0..8 {
-        for j in 0..2048 {
+        for _j in 0..2048 {
             phase_phases[i].push(Complex::<i16>::new(1, 0));
         }
     }
@@ -45,5 +47,5 @@ fn main() {
         [0x11, 0x22, 0x33, 0x44, 0x55, 0x66],
         [0x66, 0x55, 0x44, 0x33, 0x22, 0x11],
         1500,
-    );
+    ).expect("sent error");
 }

@@ -24,6 +24,24 @@ impl CtrlParam {
     }
 }
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum XGbeIdParam {
+    Upper {
+        mac1: [u8; 6],
+        mac2: [u8; 6],
+    },
+    Lower {
+        mac1: [u8; 6],
+        mac2: [u8; 6],
+        mac3: [u8; 6],
+        mac4: [u8; 6],
+        ip1: [u8; 4],
+        ip2: [u8; 4],
+        port1: u16,
+        port2: u16,
+    },
+}
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AdcMsg {
     MasterSync,
@@ -47,10 +65,8 @@ pub enum AdcMsg {
     PhaseFactor {
         value: Vec<Vec<Complex<i16>>>,
     },
+    XGbeId(XGbeIdParam),
     QueryState,
-    XGbeId {
-        value: Vec<u8>,
-    },
 }
 
 impl AdcMsg {
@@ -116,7 +132,52 @@ impl AdcMsg {
                 let cap = data.len() * 2;
                 unsafe { Vec::from_raw_parts(Box::into_raw(data) as *mut u8, cap, cap) }
             }
-            &AdcMsg::XGbeId { ref value } => value.clone(),
+            //&AdcMsg::XGbeId { ref value } => value.clone(),
+            &AdcMsg::XGbeId(XGbeIdParam::Upper { ref mac1, ref mac2 }) => {
+                let mut result = vec![];
+                mac1.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                mac2.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                result
+            }
+            &AdcMsg::XGbeId(XGbeIdParam::Lower {
+                ref mac1,
+                ref mac2,
+                ref mac3,
+                ref mac4,
+                ref ip1,
+                ref ip2,
+                ref port1,
+                ref port2,
+            }) => {
+                let mut result = vec![];
+                mac1.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                mac2.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                mac3.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                mac4.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                ip1.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                ip2.iter().rev().for_each(|&x| {
+                    result.push(x);
+                });
+                result.push((port1 & 0xff_u16) as u8);
+                result.push(((port1 >> 8) & 0xff_u16) as u8);
+                result.push((port2 & 0xff_u16) as u8);
+                result.push(((port2 >> 8) & 0xff_u16) as u8);
+                result
+            }
             _ => vec![],
         });
         result
