@@ -3,8 +3,7 @@ etherparse = '0.7.0'
 interfaces = '0.0.4'
 num-complex = '0.2.1'
 pcap = '0.7.0'
-serde_yaml = '>=0.8'
-
+serde_yaml = '0.8.7'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
