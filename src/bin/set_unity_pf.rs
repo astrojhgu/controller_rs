@@ -33,5 +33,5 @@ fn main() {
     let bc = BoardCfg::from_yaml(&param);
 
     let pf = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
-    bc.update_phase_factor(&mut cap, pf, [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+    bc.update_phase_factor(&mut cap, pf);
 }

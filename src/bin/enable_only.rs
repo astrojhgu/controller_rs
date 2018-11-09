@@ -46,5 +46,5 @@ fn main() {
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
     pf[bid][pid] = vec![Complex::<i16>::new(1, 0); 2048];
 
-    bc.update_phase_factor(&mut cap, pf, [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+    bc.update_phase_factor(&mut cap, pf);
 }

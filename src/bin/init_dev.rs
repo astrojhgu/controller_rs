@@ -35,20 +35,15 @@ fn main() -> Result<(), std::io::Error> {
 
     for i in 0..BOARD_NUM {
         let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
-        send_adc_msg(
-            &mut cap,
-            &msg,
-            bc.mac[i].clone(),
-            [0x66, 0x55, 0x44, 0x33, 0x22, 0x11],
-            1500,
-        ).expect("sent error");
+        send_adc_msg(&mut cap, &msg, bc.mac[i].clone(), bc.src_mac.clone(), 1500)
+            .expect("sent error");
     }
 
     send_adc_msg(
         &mut cap,
         &AdcMsg::MasterRst,
         bc.mac[bc.master_board_id].clone(),
-        [0x66, 0x55, 0x44, 0x33, 0x22, 0x11],
+        bc.src_mac.clone(),
         1500,
     ).expect("sent error");
 
@@ -61,13 +56,14 @@ fn main() -> Result<(), std::io::Error> {
             trig_out_delay: bc.trig_out_delay,
             optical_delay: bc.optical_delay,
         };
-        send_adc_msg(
-            &mut cap,
-            &msg,
-            bc.mac[i].clone(),
-            [0x66, 0x55, 0x44, 0x33, 0x22, 0x11],
-            1500,
-        ).expect("sent error");
+        send_adc_msg(&mut cap, &msg, bc.mac[i].clone(), bc.src_mac.clone(), 1500)
+            .expect("sent error");
     }
+
+    bc.turn_off_snap_xgbe(&mut cap);
+    bc.set_snap_xgbe_params(&mut cap);
+    bc.set_snap_app_params(&mut cap);
+    bc.turn_on_snap_xgbe(&mut cap);
+
     Ok(())
 }
