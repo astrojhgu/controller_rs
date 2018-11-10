@@ -44,7 +44,8 @@ pub struct BoardCfg {
     pub snap_ip: [u8; 4],
     pub src_mac: [u8; 6],
     pub src_ip: [u8; 4],
-    pub ctrl_port: u16,
+    pub ctrl_src_port: u16,
+    pub ctrl_dst_port: u16,
     pub snap_xgbe_params: [XGbePortParam; 9],
     pub ch_beg: usize,
     pub ch_end: usize,
@@ -207,9 +208,14 @@ impl BoardCfg {
             .enumerate()
             .for_each(|(i, x)| snap_ip[i] = x.as_u64().expect("snap ip err") as u8);
 
-        let ctrl_port = param["snap2"]["ctrl_port"]
+        let ctrl_src_port = param["snap2"]["ctrl_src_port"]
             .as_u64()
-            .expect("ctrl port missing") as u16;
+            .expect("ctrl src port missing") as u16;
+
+        let ctrl_dst_port = param["snap2"]["ctrl_dst_port"]
+            .as_u64()
+            .expect("ctrl dst port missing") as u16;
+
 
         let mut snap_xgbe_params = [XGbePortParam::default(); 9];
         param["snap2"]["xgbeparam"]
@@ -274,7 +280,8 @@ impl BoardCfg {
             ch_beg,
             ch_end,
             snap_xgbe_params,
-            ctrl_port,
+            ctrl_src_port,
+            ctrl_dst_port,
             snap_app_param: AppParam {
                 mode_sel,
                 test_mode_streams,
@@ -350,8 +357,8 @@ impl BoardCfg {
             self.src_mac.clone(),
             self.snap_ip.clone(),
             self.src_ip.clone(),
-            self.ctrl_port,
-            self.ctrl_port,
+            self.ctrl_dst_port,
+            self.ctrl_src_port,
         ).expect("sent error");
     }
 
