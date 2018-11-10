@@ -65,9 +65,9 @@ pub enum Snap2Msg {
 impl Snap2Msg {
     pub fn msg_type_code(&self) -> u8 {
         match self {
-            Snap2Msg::XGbePortParams(..) => 0xf0,
-            Snap2Msg::AppParam { .. } => 0xf1,
-            Snap2Msg::XGbePortOp(..) => 0xf2,
+            Snap2Msg::XGbePortParams(..) => 0xf1,
+            Snap2Msg::AppParam { .. } => 0xf2,
+            Snap2Msg::XGbePortOp(..) => 0xfb,
         }
     }
 
