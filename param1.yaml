@@ -196,5 +196,5 @@ truncation: 512
 master_board_id: 14
 src_mac: [0xec, 0x17, 0x2f, 0xc0, 0x5d, 0x70]
 src_ip: [100, 0, 0, 100]
-ch_beg: 0
-ch_end: 2048
+ch_beg: 400
+ch_end: 1640

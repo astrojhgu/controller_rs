@@ -225,7 +225,7 @@ impl BoardCfg {
                     dst_mac: fetch_uint_array!(u8, 6, v["dst_mac"]),
                     dst_ip: fetch_uint_array!(u8, 4, v["dst_ip"]),
                     dst_port: v["dst_port"].as_u64().expect("port missing") as u16,
-                    pkt_len: ((ch_end - ch_beg) * (2 + 2) + 8) as u32,
+                    pkt_len: if i==0 {((ch_end - ch_beg) * (2 + 2) + 8) as u32 } else{2048*4+8},
                 }
             });
 
