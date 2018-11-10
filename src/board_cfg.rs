@@ -3,8 +3,8 @@ use crate::msg::adc_msg::CtrlParam;
 use crate::msg::adc_msg::XGbeIdParam;
 use crate::msg::snap2_msg::AppParam;
 use crate::msg::snap2_msg::Snap2Msg;
-use crate::msg::snap2_msg::XGbePortParam;
 use crate::msg::snap2_msg::XGbePortOp;
+use crate::msg::snap2_msg::XGbePortParam;
 use crate::net::send_adc_msg;
 use crate::net::send_udp_buffer;
 use num_complex::Complex;
@@ -216,7 +216,6 @@ impl BoardCfg {
             .as_u64()
             .expect("ctrl dst port missing") as u16;
 
-
         let mut snap_xgbe_params = [XGbePortParam::default(); 9];
         param["snap2"]["xgbeparam"]
             .as_sequence()
@@ -231,7 +230,11 @@ impl BoardCfg {
                     dst_mac: fetch_uint_array!(u8, 6, v["dst_mac"]),
                     dst_ip: fetch_uint_array!(u8, 4, v["dst_ip"]),
                     dst_port: v["dst_port"].as_u64().expect("port missing") as u16,
-                    pkt_len: if i==0 {((ch_end - ch_beg) * (2 + 2) + 8) as u32 } else{2048*4+8},
+                    pkt_len: if i == 0 {
+                        ((ch_end - ch_beg) * (2 + 2) + 8) as u32
+                    } else {
+                        2048 * 4 + 8
+                    },
                 }
             });
 
@@ -348,7 +351,7 @@ impl BoardCfg {
         ).expect("sent error");
     }
 
-    pub fn send_snap_msg(&self, cap: &mut Capture<Active>, msg:Snap2Msg) {
+    pub fn send_snap_msg(&self, cap: &mut Capture<Active>, msg: Snap2Msg) {
         //let msg = Snap2Msg::XGbePortParams(self.snap_xgbe_params.clone()).get_raw_data();
         send_udp_buffer(
             cap,
@@ -362,19 +365,95 @@ impl BoardCfg {
         ).expect("sent error");
     }
 
-    pub fn set_snap_xgbe_params(&self, cap:&mut Capture<Active>){
+    pub fn set_snap_xgbe_params(&self, cap: &mut Capture<Active>) {
         self.send_snap_msg(cap, Snap2Msg::XGbePortParams(self.snap_xgbe_params.clone()));
     }
 
-    pub fn set_snap_app_params(&self, cap:&mut Capture<Active>){
+    pub fn set_snap_app_params(&self, cap: &mut Capture<Active>) {
         self.send_snap_msg(cap, Snap2Msg::AppParam(self.snap_app_param.clone()));
     }
 
-    pub fn turn_on_snap_xgbe(&self, cap:&mut Capture<Active>){
+    pub fn turn_on_snap_xgbe(&self, cap: &mut Capture<Active>) {
         self.send_snap_msg(cap, Snap2Msg::XGbePortOp(XGbePortOp::TurnOn));
     }
 
-    pub fn turn_off_snap_xgbe(&self, cap:&mut Capture<Active>){
+    pub fn turn_off_snap_xgbe(&self, cap: &mut Capture<Active>) {
         self.send_snap_msg(cap, Snap2Msg::XGbePortOp(XGbePortOp::TurnOff));
+    }
+
+    pub fn reset_all(&self, cap: &mut Capture<Active>) {
+        for i in 0..BOARD_NUM {
+            let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
+            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+                .expect("sent error");
+        }
+
+        send_adc_msg(
+            cap,
+            &AdcMsg::MasterRst,
+            self.mac[self.master_board_id].clone(),
+            self.src_mac.clone(),
+            1500,
+        ).expect("sent error");
+    }
+
+    pub fn set_adc_params(&self, cap: &mut Capture<Active>) {
+        for i in 0..BOARD_NUM {
+            let msg = AdcMsg::Cfg {
+                io_delay: self.io_delay[i].clone(),
+                packet_gap: self.packet_gap,
+                counter_sync: self.counter_sync,
+                counter_wait: self.counter_wait,
+                trig_out_delay: self.trig_out_delay,
+                optical_delay: self.optical_delay,
+            };
+            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+                .expect("sent error");
+        }
+    }
+
+    pub fn sync_adc(&self, cap: &mut Capture<Active>) {
+        for i in 0..BOARD_NUM {
+            let msg = AdcMsg::Ctrl(CtrlParam::IddrRst);
+            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+                .expect("sent error")
+        }
+        send_adc_msg(
+            cap,
+            &AdcMsg::MasterTrig,
+            self.mac[self.master_board_id].clone(),
+            self.src_mac.clone(),
+            1500,
+        ).expect("sent error");
+        for i in 0..BOARD_NUM {
+            let msg = AdcMsg::Ctrl(CtrlParam::Synchronize);
+            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+                .expect("sent error")
+        }
+        send_adc_msg(
+            cap,
+            &AdcMsg::MasterSync,
+            self.mac[self.master_board_id].clone(),
+            self.src_mac.clone(),
+            1500,
+        ).expect("sent error");
+    }
+
+    pub fn wait_for_trig(&self, cap: &mut Capture<Active>) {
+        for i in 0..BOARD_NUM {
+            let msg = AdcMsg::Ctrl(CtrlParam::StartFft);
+            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+                .expect("sent error")
+        }
+    }
+
+    pub fn send_internal_trig(&self, cap: &mut Capture<Active>) {
+        send_adc_msg(
+            cap,
+            &AdcMsg::MasterTrig,
+            self.mac[self.master_board_id].clone(),
+            self.src_mac.clone(),
+            1500,
+        ).expect("sent error");
     }
 }

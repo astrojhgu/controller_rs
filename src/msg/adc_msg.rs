@@ -10,6 +10,7 @@ pub enum CtrlParam {
     StartFft,
     SwitchPhaseFactor,
     StoreData,
+    IddrRst,
 }
 
 impl CtrlParam {
@@ -20,6 +21,7 @@ impl CtrlParam {
             &CtrlParam::StartFft => 2,
             &CtrlParam::SwitchPhaseFactor => 3,
             &CtrlParam::StoreData => 4,
+            &CtrlParam::IddrRst => 5,
         }
     }
 }
@@ -178,6 +180,9 @@ impl AdcMsg {
                 result.push(((port2 >> 8) & 0xff_u16) as u8);
                 result
             }
+            &AdcMsg::MasterRst => vec![0x01; 10],
+            &AdcMsg::MasterTrig => vec![0x01; 10],
+            &AdcMsg::MasterSync => vec![0x01; 10],
             _ => vec![],
         });
         result
