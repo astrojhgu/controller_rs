@@ -1,9 +1,9 @@
 [dependencies]
-etherparse = '0.7.0'
+etherparse = '0.7.1'
 interfaces = '0.0.4'
 num-complex = '0.2.1'
 pcap = '0.7.0'
-serde_yaml = '0.8.7'
+serde_yaml = '0.8.8'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']
