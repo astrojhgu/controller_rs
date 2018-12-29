@@ -297,8 +297,8 @@ impl BoardCfg {
 
     pub fn set_xgbeid(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
-            let msg = AdcMsg::XGbeId(self.xgbeid[i].clone());
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            let msg = AdcMsg::XGbeId(self.xgbeid[i]);
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error");
         }
     }
@@ -309,7 +309,7 @@ impl BoardCfg {
                 fft_shift: self.fft_shift,
                 truncation: self.truncation,
             };
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error");
         }
     }
@@ -321,7 +321,7 @@ impl BoardCfg {
         value: Vec<Vec<Complex<i16>>>,
     ) {
         let msg = AdcMsg::PhaseFactor { value };
-        send_adc_msg(cap, &msg, self.mac[bid].clone(), self.src_mac.clone(), 1500)
+        send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500)
             .expect("sent error");
     }
 
@@ -338,15 +338,15 @@ impl BoardCfg {
         }
         for bid in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::SwitchPhaseFactor);
-            send_adc_msg(cap, &msg, self.mac[bid].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500)
                 .expect("sent error");
         }
         let msg = AdcMsg::MasterTrig;
         send_adc_msg(
             cap,
             &msg,
-            self.mac[self.master_board_id].clone(),
-            self.src_mac.clone(),
+            self.mac[self.master_board_id],
+            self.src_mac,
             1500,
         ).expect("sent error");
     }
@@ -356,21 +356,21 @@ impl BoardCfg {
         send_udp_buffer(
             cap,
             &msg.get_raw_data(),
-            self.snap_mac.clone(),
-            self.src_mac.clone(),
-            self.snap_ip.clone(),
-            self.src_ip.clone(),
+            self.snap_mac,
+            self.src_mac,
+            self.snap_ip,
+            self.src_ip,
             self.ctrl_dst_port,
             self.ctrl_src_port,
         ).expect("sent error");
     }
 
     pub fn set_snap_xgbe_params(&self, cap: &mut Capture<Active>) {
-        self.send_snap_msg(cap, Snap2Msg::XGbePortParams(self.snap_xgbe_params.clone()));
+        self.send_snap_msg(cap, Snap2Msg::XGbePortParams(self.snap_xgbe_params));
     }
 
     pub fn set_snap_app_params(&self, cap: &mut Capture<Active>) {
-        self.send_snap_msg(cap, Snap2Msg::AppParam(self.snap_app_param.clone()));
+        self.send_snap_msg(cap, Snap2Msg::AppParam(self.snap_app_param));
     }
 
     pub fn turn_on_snap_xgbe(&self, cap: &mut Capture<Active>) {
@@ -384,15 +384,15 @@ impl BoardCfg {
     pub fn reset_all(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error");
         }
 
         send_adc_msg(
             cap,
             &AdcMsg::MasterRst,
-            self.mac[self.master_board_id].clone(),
-            self.src_mac.clone(),
+            self.mac[self.master_board_id],
+            self.src_mac,
             1500,
         ).expect("sent error");
     }
@@ -400,14 +400,14 @@ impl BoardCfg {
     pub fn set_adc_params(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Cfg {
-                io_delay: self.io_delay[i].clone(),
+                io_delay: self.io_delay[i],
                 packet_gap: self.packet_gap,
                 counter_sync: self.counter_sync,
                 counter_wait: self.counter_wait,
                 trig_out_delay: self.trig_out_delay,
                 optical_delay: self.optical_delay,
             };
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error");
         }
     }
@@ -415,26 +415,26 @@ impl BoardCfg {
     pub fn sync_adc(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::IddrRst);
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error")
         }
         send_adc_msg(
             cap,
             &AdcMsg::MasterTrig,
-            self.mac[self.master_board_id].clone(),
-            self.src_mac.clone(),
+            self.mac[self.master_board_id],
+            self.src_mac,
             1500,
         ).expect("sent error");
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::Synchronize);
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error")
         }
         send_adc_msg(
             cap,
             &AdcMsg::MasterSync,
-            self.mac[self.master_board_id].clone(),
-            self.src_mac.clone(),
+            self.mac[self.master_board_id],
+            self.src_mac,
             1500,
         ).expect("sent error");
     }
@@ -442,7 +442,7 @@ impl BoardCfg {
     pub fn wait_for_trig(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::StartFft);
-            send_adc_msg(cap, &msg, self.mac[i].clone(), self.src_mac.clone(), 1500)
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
                 .expect("sent error")
         }
     }
@@ -451,8 +451,8 @@ impl BoardCfg {
         send_adc_msg(
             cap,
             &AdcMsg::MasterTrig,
-            self.mac[self.master_board_id].clone(),
-            self.src_mac.clone(),
+            self.mac[self.master_board_id],
+            self.src_mac,
             1500,
         ).expect("sent error");
     }

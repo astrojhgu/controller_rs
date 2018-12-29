@@ -9,7 +9,6 @@ use controller_rs::msg::adc_msg::AdcMsg;
 use controller_rs::msg::adc_msg::CtrlParam;
 use controller_rs::net::send_adc_msg;
 use serde_yaml::{from_str, Value};
-use std::clone::Clone;
 use std::env;
 use std::fs::File;
 use std::io::Read;
@@ -35,28 +34,28 @@ fn main() -> Result<(), std::io::Error> {
 
     for i in 0..BOARD_NUM {
         let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
-        send_adc_msg(&mut cap, &msg, bc.mac[i].clone(), bc.src_mac.clone(), 1500)
+        send_adc_msg(&mut cap, &msg, bc.mac[i], bc.src_mac, 1500)
             .expect("sent error");
     }
 
     send_adc_msg(
         &mut cap,
         &AdcMsg::MasterRst,
-        bc.mac[bc.master_board_id].clone(),
-        bc.src_mac.clone(),
+        bc.mac[bc.master_board_id],
+        bc.src_mac,
         1500,
     ).expect("sent error");
 
     for i in 0..BOARD_NUM {
         let msg = AdcMsg::Cfg {
-            io_delay: bc.io_delay[i].clone(),
+            io_delay: bc.io_delay[i],
             packet_gap: bc.packet_gap,
             counter_sync: bc.counter_sync,
             counter_wait: bc.counter_wait,
             trig_out_delay: bc.trig_out_delay,
             optical_delay: bc.optical_delay,
         };
-        send_adc_msg(&mut cap, &msg, bc.mac[i].clone(), bc.src_mac.clone(), 1500)
+        send_adc_msg(&mut cap, &msg, bc.mac[i], bc.src_mac, 1500)
             .expect("sent error");
     }
 

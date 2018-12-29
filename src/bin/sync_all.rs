@@ -4,12 +4,8 @@ extern crate serde_yaml;
 
 use pcap::{Capture, Device};
 
-use controller_rs::board_cfg::{BoardCfg, BOARD_NUM};
-use controller_rs::msg::adc_msg::AdcMsg;
-use controller_rs::msg::adc_msg::CtrlParam;
-use controller_rs::net::send_adc_msg;
+use controller_rs::board_cfg::{BoardCfg};
 use serde_yaml::{from_str, Value};
-use std::clone::Clone;
 use std::env;
 use std::fs::File;
 use std::io::Read;

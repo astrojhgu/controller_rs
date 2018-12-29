@@ -1,4 +1,5 @@
- #![allow(unused_imports)]
+#![allow(clippy::too_many_arguments)]
+#![allow(unused_imports)]
 use crate::msg::adc_msg::AdcMsg;
 use crate::msg::snap2_msg::Snap2Msg;
 use etherparse;
@@ -30,7 +31,7 @@ pub fn send_raw_buffer(
         cap.sendpacket(&sub_buf[..])?
     } else {
         for x in buf.chunks(mtu_len - 1) {
-            let mut payload = Vec::from_iter(x.iter().map(|x| *x));
+            let mut payload = Vec::from_iter(x.iter().cloned());
             while payload.len() < MIN_PAYLOAD_LEN {
                 payload.push(0);
             }
@@ -78,9 +79,9 @@ pub fn send_udp_buffer(
         .udp(src_port, dst_port);
 
     let mut sub_buf = Vec::new();
-    let _ = builder
+    builder
         .write(&mut sub_buf, &buf)
         .expect("udp packet compose err");
-    let _ = cap.sendpacket(&sub_buf[..]).expect("sent error");
+    cap.sendpacket(&sub_buf[..]).expect("sent error");
     Ok(())
 }

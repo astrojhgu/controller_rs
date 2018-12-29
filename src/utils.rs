@@ -1,7 +1,7 @@
 use std;
 use std::slice;
 
-pub fn to_u8_slice<'a, T>(src: &'a T) -> &'a [u8]
+pub fn to_u8_slice<T>(src: &T) -> &[u8]
 where
     T: Sized,
 {

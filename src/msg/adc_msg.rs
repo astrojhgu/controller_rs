@@ -1,3 +1,5 @@
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::identity_op)]
 use num_complex::Complex;
 
 const PORT_PER_BOARD: usize = 8;
@@ -14,14 +16,14 @@ pub enum CtrlParam {
 }
 
 impl CtrlParam {
-    pub fn param_code(&self) -> u8 {
+    pub fn param_code(self) -> u8 {
         match self {
-            &CtrlParam::Synchronize => 0,
-            &CtrlParam::PreRst => 1,
-            &CtrlParam::StartFft => 2,
-            &CtrlParam::SwitchPhaseFactor => 3,
-            &CtrlParam::StoreData => 4,
-            &CtrlParam::IddrRst => 5,
+            CtrlParam::Synchronize => 0,
+            CtrlParam::PreRst => 1,
+            CtrlParam::StartFft => 2,
+            CtrlParam::SwitchPhaseFactor => 3,
+            CtrlParam::StoreData => 4,
+            CtrlParam::IddrRst => 5,
         }
     }
 }
@@ -73,26 +75,26 @@ pub enum AdcMsg {
 
 impl AdcMsg {
     pub fn msg_type_code(&self) -> u8 {
-        match self {
-            &AdcMsg::MasterSync => 0xf0,
-            &AdcMsg::MasterRst => 0xf1,
-            &AdcMsg::MasterTrig => 0xf2,
-            &AdcMsg::Ctrl(..) => 0xf3,
-            &AdcMsg::Cfg { .. } => 0xf4,
-            &AdcMsg::UploadData => 0xf5,
-            &AdcMsg::UploadFft => 0xf6,
-            &AdcMsg::FftParam { .. } => 0xf8,
-            &AdcMsg::PhaseFactor { .. } => 0xf9,
-            &AdcMsg::QueryState { .. } => 0xfa,
-            &AdcMsg::XGbeId { .. } => 0xfb,
+        match *self {
+            AdcMsg::MasterSync => 0xf0,
+            AdcMsg::MasterRst => 0xf1,
+            AdcMsg::MasterTrig => 0xf2,
+            AdcMsg::Ctrl(..) => 0xf3,
+            AdcMsg::Cfg { .. } => 0xf4,
+            AdcMsg::UploadData => 0xf5,
+            AdcMsg::UploadFft => 0xf6,
+            AdcMsg::FftParam { .. } => 0xf8,
+            AdcMsg::PhaseFactor { .. } => 0xf9,
+            AdcMsg::QueryState { .. } => 0xfa,
+            AdcMsg::XGbeId { .. } => 0xfb,
         }
     }
 
     pub fn get_raw_data(&self) -> Vec<u8> {
         let mut result = Vec::new();
-        result.append(&mut match self {
-            &AdcMsg::Ctrl(p) => vec![p.param_code()],
-            &AdcMsg::Cfg {
+        result.append(&mut match *self {
+            AdcMsg::Ctrl(p) => vec![p.param_code()],
+            AdcMsg::Cfg {
                 ref io_delay,
                 packet_gap,
                 counter_sync,
@@ -111,18 +113,18 @@ impl AdcMsg {
                 result.push(optical_delay);
                 result
             }
-            &AdcMsg::FftParam {
+            AdcMsg::FftParam {
                 fft_shift,
                 truncation,
             } => vec![
                 (fft_shift & 0x00ff) as u8,
                 (fft_shift >> 8) as u8,
-                ((truncation >> 0) & 0x000000ff) as u8,
-                ((truncation >> 8) & 0x000000ff) as u8,
-                ((truncation >> 16) & 0x000000ff) as u8,
-                ((truncation >> 24) & 0x000000ff) as u8,
+                ((truncation >> 0) & 0x0000_00ff) as u8,
+                ((truncation >> 8) & 0x0000_00ff) as u8,
+                ((truncation >> 16) & 0x0000_00ff) as u8,
+                ((truncation >> 24) & 0x0000_00ff) as u8,
             ],
-            &AdcMsg::PhaseFactor { ref value } => {
+            AdcMsg::PhaseFactor { ref value } => {
                 let mut data = Vec::<i16>::new();
                 for i in 0..PORT_PER_BOARD {
                     for j in 0..NUM_CH {
@@ -135,7 +137,7 @@ impl AdcMsg {
                 unsafe { Vec::from_raw_parts(Box::into_raw(data) as *mut u8, cap, cap) }
             }
             //&AdcMsg::XGbeId { ref value } => value.clone(),
-            &AdcMsg::XGbeId(XGbeIdParam::Upper { ref mac1, ref mac2 }) => {
+            AdcMsg::XGbeId(XGbeIdParam::Upper { ref mac1, ref mac2 }) => {
                 let mut result = vec![];
                 mac1.iter().rev().for_each(|&x| {
                     result.push(x);
@@ -145,7 +147,7 @@ impl AdcMsg {
                 });
                 result
             }
-            &AdcMsg::XGbeId(XGbeIdParam::Lower {
+            AdcMsg::XGbeId(XGbeIdParam::Lower {
                 ref mac1,
                 ref mac2,
                 ref mac3,
@@ -180,9 +182,9 @@ impl AdcMsg {
                 result.push(((port2 >> 8) & 0xff_u16) as u8);
                 result
             }
-            &AdcMsg::MasterRst => vec![0x01; 10],
-            &AdcMsg::MasterTrig => vec![0x01; 10],
-            &AdcMsg::MasterSync => vec![0x01; 10],
+            AdcMsg::MasterRst => vec![0x01; 10],
+            AdcMsg::MasterTrig => vec![0x01; 10],
+            AdcMsg::MasterSync => vec![0x01; 10],
             _ => vec![],
         });
         result

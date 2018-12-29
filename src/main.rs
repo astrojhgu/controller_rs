@@ -1,3 +1,4 @@
+#![allow(clippy::needless_range_loop)]
 #![allow(unused_imports)]
 
 extern crate controller_rs;
