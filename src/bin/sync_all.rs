@@ -4,7 +4,7 @@ extern crate serde_yaml;
 
 use pcap::{Capture, Device};
 
-use controller_rs::board_cfg::{BoardCfg};
+use controller_rs::board_cfg::BoardCfg;
 use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
@@ -18,7 +18,8 @@ fn main() -> Result<(), std::io::Error> {
             .expect("iface name not found")
             .to_string(),
         desc: None,
-    }).unwrap()
+    })
+    .unwrap()
     .open()
     .unwrap();
 

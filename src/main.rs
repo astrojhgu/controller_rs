@@ -14,7 +14,8 @@ fn main() {
     let mut cap = Capture::from_device(Device {
         name: "enp0s20f0u1u4".to_string(),
         desc: None,
-    }).unwrap()
+    })
+    .unwrap()
     .open()
     .unwrap();
     //let msg=adc_msg::AdcMsg::Ctrl(adc_msg::CtrlParam::PreRst);
@@ -48,5 +49,6 @@ fn main() {
         [0x11, 0x22, 0x33, 0x44, 0x55, 0x66],
         [0x66, 0x55, 0x44, 0x33, 0x22, 0x11],
         1500,
-    ).expect("sent error");
+    )
+    .expect("sent error");
 }

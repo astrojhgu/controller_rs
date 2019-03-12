@@ -111,19 +111,24 @@ impl AdcMsg {
                 result.push((counter_wait >> 8) as u8);
                 result.push(trig_out_delay);
                 result.push(optical_delay);
+                result.append(&mut vec![0;89]);//make it compatible to GUI App
                 result
             }
             AdcMsg::FftParam {
                 fft_shift,
                 truncation,
-            } => vec![
+            } => {
+                let mut result=vec![
                 (fft_shift & 0x00ff) as u8,
                 (fft_shift >> 8) as u8,
                 ((truncation >> 0) & 0x0000_00ff) as u8,
                 ((truncation >> 8) & 0x0000_00ff) as u8,
                 ((truncation >> 16) & 0x0000_00ff) as u8,
                 ((truncation >> 24) & 0x0000_00ff) as u8,
-            ],
+                ];
+                result.append(&mut vec![0;94]);
+                result
+            },
             AdcMsg::PhaseFactor { ref value } => {
                 let mut data = Vec::<i16>::new();
                 for i in 0..PORT_PER_BOARD {
@@ -145,6 +150,7 @@ impl AdcMsg {
                 mac2.iter().rev().for_each(|&x| {
                     result.push(x);
                 });
+                result.append(&mut vec![0;88]);
                 result
             }
             AdcMsg::XGbeId(XGbeIdParam::Lower {
@@ -180,6 +186,7 @@ impl AdcMsg {
                 result.push(((port1 >> 8) & 0xff_u16) as u8);
                 result.push((port2 & 0xff_u16) as u8);
                 result.push(((port2 >> 8) & 0xff_u16) as u8);
+                result.append(&mut vec![0;64]);
                 result
             }
             AdcMsg::MasterRst => vec![0x01; 10],

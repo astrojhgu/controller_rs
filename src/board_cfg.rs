@@ -174,7 +174,8 @@ impl BoardCfg {
                         port2,
                     }
                 }
-            }).collect();
+            })
+            .collect();
         let mut io_delay = [[0_u8; ADC_PER_BOARD]; BOARD_NUM];
 
         param["io_delay"]
@@ -298,8 +299,7 @@ impl BoardCfg {
     pub fn set_xgbeid(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::XGbeId(self.xgbeid[i]);
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error");
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
     }
 
@@ -309,8 +309,7 @@ impl BoardCfg {
                 fft_shift: self.fft_shift,
                 truncation: self.truncation,
             };
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error");
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
     }
 
@@ -321,8 +320,7 @@ impl BoardCfg {
         value: Vec<Vec<Complex<i16>>>,
     ) {
         let msg = AdcMsg::PhaseFactor { value };
-        send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500)
-            .expect("sent error");
+        send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
     }
 
     pub fn update_phase_factor(
@@ -330,16 +328,15 @@ impl BoardCfg {
         cap: &mut Capture<Active>,
         value: Vec<Vec<Vec<Complex<i16>>>>,
     ) {
-        self.set_xgbeid(cap);
-        self.set_fft_param(cap);
+        //self.set_xgbeid(cap);
+        //self.set_fft_param(cap);
         assert_eq!(value.len(), BOARD_NUM);
         for (bid, pf) in value.into_iter().enumerate() {
             self.update_phase_factor1(cap, bid, pf);
         }
         for bid in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::SwitchPhaseFactor);
-            send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500)
-                .expect("sent error");
+            send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
         }
         let msg = AdcMsg::MasterTrig;
         send_adc_msg(
@@ -348,7 +345,8 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        ).expect("sent error");
+        )
+        .expect("sent error");
     }
 
     pub fn send_snap_msg(&self, cap: &mut Capture<Active>, msg: Snap2Msg) {
@@ -362,7 +360,8 @@ impl BoardCfg {
             self.src_ip,
             self.ctrl_dst_port,
             self.ctrl_src_port,
-        ).expect("sent error");
+        )
+        .expect("sent error");
     }
 
     pub fn set_snap_xgbe_params(&self, cap: &mut Capture<Active>) {
@@ -384,8 +383,7 @@ impl BoardCfg {
     pub fn reset_all(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error");
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
 
         send_adc_msg(
@@ -394,7 +392,8 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        ).expect("sent error");
+        )
+        .expect("sent error");
     }
 
     pub fn set_adc_params(&self, cap: &mut Capture<Active>) {
@@ -407,16 +406,14 @@ impl BoardCfg {
                 trig_out_delay: self.trig_out_delay,
                 optical_delay: self.optical_delay,
             };
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error");
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
     }
 
     pub fn sync_adc(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::IddrRst);
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error")
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
         send_adc_msg(
             cap,
@@ -424,11 +421,11 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        ).expect("sent error");
+        )
+        .expect("sent error");
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::Synchronize);
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error")
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
         send_adc_msg(
             cap,
@@ -436,14 +433,14 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        ).expect("sent error");
+        )
+        .expect("sent error");
     }
 
     pub fn wait_for_trig(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
             let msg = AdcMsg::Ctrl(CtrlParam::StartFft);
-            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500)
-                .expect("sent error")
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
     }
 
@@ -454,6 +451,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        ).expect("sent error");
+        )
+        .expect("sent error");
     }
 }

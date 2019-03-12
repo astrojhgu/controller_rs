@@ -21,7 +21,8 @@ fn main() {
             .expect("iface name not found")
             .to_string(),
         desc: None,
-    }).unwrap()
+    })
+    .unwrap()
     .open()
     .unwrap();
 
