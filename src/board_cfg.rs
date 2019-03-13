@@ -473,4 +473,32 @@ impl BoardCfg {
         )
         .expect("sent error");
     }
+
+    pub fn store_data(&self, cap:&mut Capture<Active>){
+        for i in 0..BOARD_NUM {
+            println!("prepare board {} to store data", i);
+            let msg = AdcMsg::Ctrl(CtrlParam::StoreData);
+            send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
+        }
+        println!("send trig from master board, i.e., board {}", self.master_board_id);
+        send_adc_msg(
+            cap,
+            &AdcMsg::MasterTrig,
+            self.mac[self.master_board_id],
+            self.src_mac,
+            1500,
+        )
+        .expect("sent error");
+    }
+
+    pub fn fetch_fft_data1(&self, bid:usize, cap:&mut Capture<Active>){
+        println!("fetching data from board {}", bid);
+        send_adc_msg(
+            cap,
+            &AdcMsg::UploadFft,
+            self.mac[bid],
+            self.src_mac,
+            1500,
+        ).expect("sent error");
+    }
 }
