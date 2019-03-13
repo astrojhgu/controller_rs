@@ -32,7 +32,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "controller_rs"
 version = "0.1.0"
 dependencies = [
- "etherparse 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "etherparse 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "interfaces 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "pcap 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -46,7 +46,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "etherparse"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -304,7 +304,7 @@ dependencies = [
 "checksum byteorder 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a019b10a2a7cdeb292db131fc8113e57ea2a908f6e7894b0c3c671893b65dbeb"
 "checksum cfg-if 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "11d43355396e872eefb45ce6342e4374ed7bc2b3a502d1b28e36d6e23c05d1f4"
 "checksum dtoa 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "6d301140eb411af13d3115f9a562c85cc6b541ade9dfa314132244aaee7489dd"
-"checksum etherparse 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)" = "730d58e3067222fa7639a643ec774c801e721c95277faf2c7c47c8927acdfc8e"
+"checksum etherparse 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d4ed59db6e54d52a22309fe2fa4f26f6e356b68e76d4a53c272699ee1e9b812e"
 "checksum gcc 0.3.55 (registry+https://github.com/rust-lang/crates.io-index)" = "8f5f3913fa0bfe7ee1fd8248b6b9f42a5af4b9d65ec2dd2c3c26132b950ecfc2"
 "checksum handlebars 0.29.1 (registry+https://github.com/rust-lang/crates.io-index)" = "fb04af2006ea09d985fef82b81e0eb25337e51b691c76403332378a53d521edc"
 "checksum interfaces 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "2f82d79233e87e33949912ccb8046e4324f908275a1cac138646f47fab10c856"
