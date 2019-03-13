@@ -46,40 +46,11 @@ fn main() -> Result<(), std::io::Error> {
     let param = from_str::<Value>(&msg_str).expect("Unable to read param");
     let bc = BoardCfg::from_yaml(&param);
 
-    bc.reset_all(&mut *tx);
-    bc.sync_adc(&mut *tx);
-    bc.set_adc_params(&mut *tx);
-
-    thread::sleep(Duration::from_millis(500));
-    
     bc.turn_off_snap_xgbe(&mut *tx);
-    thread::sleep(Duration::from_millis(500));
     bc.set_snap_xgbe_params(&mut *tx);
-    thread::sleep(Duration::from_millis(500));
     bc.set_snap_app_params(&mut *tx);
-    thread::sleep(Duration::from_millis(500));
     bc.turn_on_snap_xgbe(&mut *tx);
-
-    thread::sleep(Duration::from_millis(500));
-
-    //return Ok(());
-    bc.set_xgbeid(&mut *tx);
-
-    thread::sleep(Duration::from_millis(500));
-
-    bc.set_fft_param(&mut *tx);
-
-    thread::sleep(Duration::from_millis(500));
-
-    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
-
-    bc.update_phase_factor(&mut *tx, init_phase_factors);
-
-    bc.wait_for_trig(&mut *tx);
-
-    thread::sleep(Duration::from_millis(2000));
-
-    bc.send_internal_trig(&mut *tx);
     
+
     Ok(())
 }

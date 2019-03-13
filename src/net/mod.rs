@@ -28,7 +28,7 @@ pub fn send_raw_buffer(
         sub_buf[12] = ((payload_len >> 8) & 0xff) as u8;
         sub_buf[13] = (payload_len & 0xff) as u8;
         sub_buf[14] = msg_type;
-        thread::sleep(Duration::from_millis(10));
+        thread::sleep(Duration::from_millis(20));
         //cap.sendpacket(&sub_buf[..])?
         tx.send_to(&sub_buf[..], None).expect("send error");
     } else {
@@ -46,7 +46,7 @@ pub fn send_raw_buffer(
             sub_buf[14] = msg_type;
             sub_buf[15..].copy_from_slice(&payload);
             //println!("len={}", sub_buf.len());
-            thread::sleep(Duration::from_millis(10));
+            thread::sleep(Duration::from_millis(20));
             //cap.sendpacket(&sub_buf[..])?
             tx.send_to(&sub_buf[..], None).expect("send error");
         }
@@ -87,6 +87,8 @@ pub fn send_udp_buffer(
         .write(&mut sub_buf, &buf)
         .expect("udp packet compose err");
     //cap.sendpacket(&sub_buf[..]).expect("sent error");
+    sub_buf[0x28]=0;//no checksum 
+    sub_buf[0x29]=0;
     tx.send_to(&sub_buf[..], None).expect("error");
     Ok(())
 }
