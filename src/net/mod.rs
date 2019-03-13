@@ -7,6 +7,8 @@ use pcap::Active;
 use pcap::Capture;
 use pcap::Error;
 use std::iter::FromIterator;
+use std::time::Duration;
+use std::thread;
 pub const UDP_HDR_LEN: usize = 42;
 pub const MIN_PAYLOAD_LEN: usize = 80;
 
@@ -27,7 +29,7 @@ pub fn send_raw_buffer(
         sub_buf[12] = ((payload_len >> 8) & 0xff) as u8;
         sub_buf[13] = (payload_len & 0xff) as u8;
         sub_buf[14] = msg_type;
-
+        thread::sleep(Duration::from_millis(5));
         cap.sendpacket(&sub_buf[..])?
     } else {
         for x in buf.chunks(mtu_len - 1) {
@@ -44,6 +46,7 @@ pub fn send_raw_buffer(
             sub_buf[14] = msg_type;
             sub_buf[15..].copy_from_slice(&payload);
             println!("len={}", sub_buf.len());
+            thread::sleep(Duration::from_millis(5));
             cap.sendpacket(&sub_buf[..])?
         }
     }
@@ -72,7 +75,7 @@ pub fn send_udp_buffer(
     dst_port: u16,
     src_port: u16,
 ) -> Result<(), Error> {
-    println!("{}", buf.len());
+    println!("udp len={}", buf.len());
     //assert!(buf.len() >= 80);
     let builder = etherparse::PacketBuilder::ethernet2(src_mac, dst_mac)
         .ipv4(src_ip, dst_ip, 0xff)

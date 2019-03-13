@@ -121,7 +121,7 @@ fn main() -> Result<(), std::io::Error> {
 
     bc.set_fft_param(&mut cap);
 
-    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
+    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1,0); 2048]; 8]; 16];
 
     bc.update_phase_factor(&mut cap, init_phase_factors);
 
