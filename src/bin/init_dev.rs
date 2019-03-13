@@ -1,13 +1,11 @@
 extern crate controller_rs;
 extern crate num_complex;
-extern crate pcap;
+extern crate pnet;
 extern crate serde_yaml;
-use controller_rs::board_cfg::{BoardCfg, BOARD_NUM};
-use controller_rs::msg::adc_msg::AdcMsg;
-use controller_rs::msg::adc_msg::CtrlParam;
-use controller_rs::net::send_adc_msg;
+use pnet::datalink::interfaces;
+use pnet::datalink::{channel, Channel, ChannelType, Config};
+use controller_rs::board_cfg::{BoardCfg};
 use num_complex::Complex;
-use pcap::{Capture, Device};
 use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
@@ -17,16 +15,27 @@ use std::thread;
 use std::time::Duration;
 
 fn main() -> Result<(), std::io::Error> {
-    let mut cap = Capture::from_device(Device {
-        name: env::args()
-            .nth(1)
-            .expect("iface name not found")
-            .to_string(),
-        desc: None,
-    })
-    .unwrap()
-    .open()
-    .unwrap();
+    let dev_name=env::args().nth(1).expect("Dev name not given");
+    let dev=interfaces().into_iter().filter(|x|{x.name==dev_name}).nth(0).expect("Cannot find dev");
+
+    let net_cfg = Config {
+        write_buffer_size: 65536,
+        read_buffer_size: 65536,
+        read_timeout: None,
+        write_timeout: None,
+        channel_type: ChannelType::Layer2,
+        bpf_fd_attempts: 1000,
+        linux_fanout: None,
+    };
+
+
+    let (mut tx, _) =
+        if let Channel::Ethernet(tx, rx) = channel(&dev, net_cfg).expect("canot open channel") {
+            (tx, rx)
+        } else {
+            panic!();
+        };
+
 
     let mut fparam = File::open(env::args().nth(2).unwrap()).unwrap();
     let mut bytes = Vec::new();
@@ -35,7 +44,7 @@ fn main() -> Result<(), std::io::Error> {
     let param = from_str::<Value>(&msg_str).expect("Unable to read param");
     let bc = BoardCfg::from_yaml(&param);
 
-    bc.reset_all(&mut cap);
+    bc.reset_all(&mut *tx);
 
     /*
     //rst each board f3 01
@@ -56,7 +65,7 @@ fn main() -> Result<(), std::io::Error> {
 
      */
 
-    bc.sync_adc(&mut cap);
+    bc.sync_adc(&mut *tx);
     /*
 
     //each board Iddr rst f3 05
@@ -93,7 +102,7 @@ fn main() -> Result<(), std::io::Error> {
         .expect("sent error");
      */
 
-    bc.set_adc_params(&mut cap);
+    bc.set_adc_params(&mut *tx);
     /*
 
 
@@ -112,24 +121,24 @@ fn main() -> Result<(), std::io::Error> {
 
          */
 
-    bc.turn_off_snap_xgbe(&mut cap);
-    bc.set_snap_xgbe_params(&mut cap);
-    bc.set_snap_app_params(&mut cap);
-    bc.turn_on_snap_xgbe(&mut cap);
+    bc.turn_off_snap_xgbe(&mut *tx);
+    bc.set_snap_xgbe_params(&mut *tx);
+    bc.set_snap_app_params(&mut *tx);
+    bc.turn_on_snap_xgbe(&mut *tx);
 
-    bc.set_xgbeid(&mut cap);
+    bc.set_xgbeid(&mut *tx);
 
-    bc.set_fft_param(&mut cap);
+    bc.set_fft_param(&mut *tx);
 
     let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1,0); 2048]; 8]; 16];
 
-    bc.update_phase_factor(&mut cap, init_phase_factors);
+    bc.update_phase_factor(&mut *tx, init_phase_factors);
 
-    bc.wait_for_trig(&mut cap);
+    bc.wait_for_trig(&mut *tx);
 
     thread::sleep(Duration::from_millis(5000));
 
-    bc.send_internal_trig(&mut cap);
+    bc.send_internal_trig(&mut *tx);
 
     Ok(())
 }

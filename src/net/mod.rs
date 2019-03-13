@@ -3,9 +3,8 @@
 use crate::msg::adc_msg::AdcMsg;
 use crate::msg::snap2_msg::Snap2Msg;
 use etherparse;
-use pcap::Active;
-use pcap::Capture;
-use pcap::Error;
+use pnet::datalink::{DataLinkSender};
+use std::io::Error;
 use std::iter::FromIterator;
 use std::time::Duration;
 use std::thread;
@@ -13,7 +12,7 @@ pub const UDP_HDR_LEN: usize = 42;
 pub const MIN_PAYLOAD_LEN: usize = 80;
 
 pub fn send_raw_buffer(
-    cap: &mut Capture<Active>,
+    tx: &mut DataLinkSender,
     msg_type: u8,
     buf: &[u8],
     dst_mac: [u8; 6],
@@ -30,7 +29,8 @@ pub fn send_raw_buffer(
         sub_buf[13] = (payload_len & 0xff) as u8;
         sub_buf[14] = msg_type;
         thread::sleep(Duration::from_millis(10));
-        cap.sendpacket(&sub_buf[..])?
+        //cap.sendpacket(&sub_buf[..])?
+        tx.send_to(&sub_buf[..], None).expect("send error");
     } else {
         for x in buf.chunks(mtu_len - 1) {
             let mut payload = Vec::from_iter(x.iter().cloned());
@@ -47,14 +47,15 @@ pub fn send_raw_buffer(
             sub_buf[15..].copy_from_slice(&payload);
             //println!("len={}", sub_buf.len());
             thread::sleep(Duration::from_millis(10));
-            cap.sendpacket(&sub_buf[..])?
+            //cap.sendpacket(&sub_buf[..])?
+            tx.send_to(&sub_buf[..], None).expect("send error");
         }
     }
     Ok(())
 }
 
 pub fn send_adc_msg(
-    cap: &mut Capture<Active>,
+    tx: &mut DataLinkSender,
     msg: &AdcMsg,
     dst_mac: [u8; 6],
     src_mac: [u8; 6],
@@ -62,11 +63,11 @@ pub fn send_adc_msg(
 ) -> Result<(), Error> {
     let msg_type = msg.msg_type_code();
     let buffer = msg.get_raw_data();
-    send_raw_buffer(cap, msg_type, &buffer, dst_mac, src_mac, mut_len)
+    send_raw_buffer(tx, msg_type, &buffer, dst_mac, src_mac, mut_len)
 }
 
 pub fn send_udp_buffer(
-    cap: &mut Capture<Active>,
+    tx: &mut DataLinkSender,
     buf: &[u8],
     dst_mac: [u8; 6],
     src_mac: [u8; 6],
@@ -85,6 +86,7 @@ pub fn send_udp_buffer(
     builder
         .write(&mut sub_buf, &buf)
         .expect("udp packet compose err");
-    cap.sendpacket(&sub_buf[..]).expect("sent error");
+    //cap.sendpacket(&sub_buf[..]).expect("sent error");
+    tx.send_to(&sub_buf[..], None).expect("error");
     Ok(())
 }
