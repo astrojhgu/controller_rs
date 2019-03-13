@@ -6,7 +6,7 @@ use pnet::datalink::interfaces;
 use pnet::datalink::{channel, Channel, ChannelType, Config};
 
 extern crate serde_yaml;
-use controller_rs::board_cfg::{BoardCfg};
+use controller_rs::board_cfg::BoardCfg;
 use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
@@ -15,8 +15,12 @@ use std::str;
 use std::time::Duration;
 
 fn main() -> Result<(), std::io::Error> {
-    let dev_name=env::args().nth(1).expect("Dev name not given");
-    let dev=interfaces().into_iter().filter(|x|{x.name==dev_name}).nth(0).expect("Cannot find dev");
+    let dev_name = env::args().nth(1).expect("Dev name not given");
+    let dev = interfaces()
+        .into_iter()
+        .filter(|x| x.name == dev_name)
+        .nth(0)
+        .expect("Cannot find dev");
 
     let net_cfg = Config {
         write_buffer_size: 65536,
@@ -27,7 +31,6 @@ fn main() -> Result<(), std::io::Error> {
         bpf_fd_attempts: 1000,
         linux_fanout: None,
     };
-
 
     let (mut tx, mut rx) =
         if let Channel::Ethernet(tx, rx) = channel(&dev, net_cfg).expect("canot open channel") {
@@ -45,13 +48,8 @@ fn main() -> Result<(), std::io::Error> {
 
     bc.store_data(&mut *tx);
 
-    bc.fetch_fft_data1(0, &mut *tx);
-
-    let mut cnt=0;
-    while let Ok(packet)=rx.next(){
-        cnt+=1;
-        println!("{} {}",cnt, packet.len());
-    }
+    let fft_data = bc.fetch_fft_data(&mut *tx, &mut *rx);
+    println!("{:?}", fft_data[0]);
 
     Ok(())
 }

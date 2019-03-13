@@ -1,11 +1,10 @@
 extern crate controller_rs;
 extern crate num_complex;
-extern crate serde_yaml;
 extern crate pnet;
+extern crate serde_yaml;
 
 use pnet::datalink::interfaces;
 use pnet::datalink::{channel, Channel, ChannelType, Config};
-
 
 use serde_yaml::{from_str, Value};
 use std::env;
@@ -15,12 +14,15 @@ use std::str;
 
 use num_complex::Complex;
 
-
 use controller_rs::board_cfg::BoardCfg;
 
 fn main() {
-    let dev_name=env::args().nth(1).expect("Dev name not given");
-    let dev=interfaces().into_iter().filter(|x|{x.name==dev_name}).nth(0).expect("Cannot find dev");
+    let dev_name = env::args().nth(1).expect("Dev name not given");
+    let dev = interfaces()
+        .into_iter()
+        .filter(|x| x.name == dev_name)
+        .nth(0)
+        .expect("Cannot find dev");
 
     let net_cfg = Config {
         write_buffer_size: 65536,
@@ -31,7 +33,6 @@ fn main() {
         bpf_fd_attempts: 1000,
         linux_fanout: None,
     };
-
 
     let (mut tx, _) =
         if let Channel::Ethernet(tx, rx) = channel(&dev, net_cfg).expect("canot open channel") {

@@ -3,11 +3,11 @@
 use crate::msg::adc_msg::AdcMsg;
 use crate::msg::snap2_msg::Snap2Msg;
 use etherparse;
-use pnet::datalink::{DataLinkSender};
+use pnet::datalink::DataLinkSender;
 use std::io::Error;
 use std::iter::FromIterator;
-use std::time::Duration;
 use std::thread;
+use std::time::Duration;
 pub const UDP_HDR_LEN: usize = 42;
 pub const MIN_PAYLOAD_LEN: usize = 80;
 

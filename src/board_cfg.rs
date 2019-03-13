@@ -9,7 +9,7 @@ use crate::net::send_adc_msg;
 use crate::net::send_udp_buffer;
 use num_complex::Complex;
 //use pcap::{Active, Capture};
-use pnet::datalink::{DataLinkSender};
+use pnet::datalink::{DataLinkReceiver, DataLinkSender};
 use serde_yaml::Value;
 pub const BOARD_NUM: usize = 16;
 pub const ADC_PER_BOARD: usize = 4;
@@ -326,33 +326,23 @@ impl BoardCfg {
         send_adc_msg(tx, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
     }
 
-    pub fn update_phase_factor(
-        &self,
-        tx: &mut DataLinkSender,
-        value: Vec<Vec<Vec<Complex<i16>>>>,
-    ) {
+    pub fn update_phase_factor(&self, tx: &mut DataLinkSender, value: Vec<Vec<Vec<Complex<i16>>>>) {
         //self.set_xgbeid(tx);
         //self.set_fft_param(tx);
         assert_eq!(value.len(), BOARD_NUM);
         for (bid, pf) in value.into_iter().enumerate() {
-            println!("uploading phase factor to board {}",bid); 
+            println!("uploading phase factor to board {}", bid);
             self.update_phase_factor1(tx, bid, pf);
         }
         for bid in 0..BOARD_NUM {
-            println!("flipping phase factor of board {}",bid); 
+            println!("flipping phase factor of board {}", bid);
             let msg = AdcMsg::Ctrl(CtrlParam::SwitchPhaseFactor);
             send_adc_msg(tx, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
         }
         println!("enabling new phase factor");
         let msg = AdcMsg::MasterTrig;
-        send_adc_msg(
-            tx,
-            &msg,
-            self.mac[self.master_board_id],
-            self.src_mac,
-            1500,
-        )
-        .expect("sent error");
+        send_adc_msg(tx, &msg, self.mac[self.master_board_id], self.src_mac, 1500)
+            .expect("sent error");
     }
 
     pub fn send_snap_msg(&self, tx: &mut DataLinkSender, msg: Snap2Msg) {
@@ -397,7 +387,10 @@ impl BoardCfg {
             send_adc_msg(tx, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
 
-        println!("reseting master board, i.e., board {}", self.master_board_id);
+        println!(
+            "reseting master board, i.e., board {}",
+            self.master_board_id
+        );
         send_adc_msg(
             tx,
             &AdcMsg::MasterRst,
@@ -430,7 +423,10 @@ impl BoardCfg {
             let msg = AdcMsg::Ctrl(CtrlParam::IddrRst);
             send_adc_msg(tx, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
-        println!("reseting master board, i.e., board {}", self.master_board_id);
+        println!(
+            "reseting master board, i.e., board {}",
+            self.master_board_id
+        );
         send_adc_msg(
             tx,
             &AdcMsg::MasterTrig,
@@ -464,7 +460,10 @@ impl BoardCfg {
     }
 
     pub fn send_internal_trig(&self, tx: &mut DataLinkSender) {
-        println!("asking master board, i.e., board {} to send internal trig sig", self.master_board_id);
+        println!(
+            "asking master board, i.e., board {} to send internal trig sig",
+            self.master_board_id
+        );
         send_adc_msg(
             tx,
             &AdcMsg::MasterTrig,
@@ -475,13 +474,16 @@ impl BoardCfg {
         .expect("sent error");
     }
 
-    pub fn store_data(&self, tx:&mut DataLinkSender){
+    pub fn store_data(&self, tx: &mut DataLinkSender) {
         for i in 0..BOARD_NUM {
             println!("prepare board {} to store data", i);
             let msg = AdcMsg::Ctrl(CtrlParam::StoreData);
             send_adc_msg(tx, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
-        println!("send trig from master board, i.e., board {}", self.master_board_id);
+        println!(
+            "send trig from master board, i.e., board {}",
+            self.master_board_id
+        );
         send_adc_msg(
             tx,
             &AdcMsg::MasterTrig,
@@ -492,14 +494,78 @@ impl BoardCfg {
         .expect("sent error");
     }
 
-    pub fn fetch_fft_data1(&self, bid:usize, tx:&mut DataLinkSender){
+    pub fn fetch_fft_data1(
+        &self,
+        bid: usize,
+        tx: &mut DataLinkSender,
+        rx: &mut DataLinkReceiver,
+    ) -> Option<Vec<Vec<Complex<i32>>>> {
+        let result = vec![vec![Complex::<i32>::new(1, 1); 2048]; 8];
         println!("fetching data from board {}", bid);
-        send_adc_msg(
-            tx,
-            &AdcMsg::UploadFft,
-            self.mac[bid],
-            self.src_mac,
-            1500,
-        ).expect("sent error");
+        send_adc_msg(tx, &AdcMsg::UploadFft, self.mac[bid], self.src_mac, 1500)
+            .expect("sent error");
+
+        let mut cnt = 0;
+        while let Ok(packet) = rx.next() {
+            if packet.len() != 1024 + 12 + 2 + 4 + 1 {
+                println!("a");
+                continue;
+            }
+            let src_mac = &packet[6..13];
+            if src_mac
+                .iter()
+                .zip(self.mac[bid].iter())
+                .any(|(&i, &j)| i != j)
+            {
+                continue;
+            }
+            let data_order = (packet[18] - 1) as usize;
+            let data = &packet[19..];
+
+            let chip_id = (data_order / 16) as usize; //16 packet for one chip
+            let ch_chunk_id = (data_order - 16 * chip_id) as usize;
+
+            //println!("{} {} {} {}", data_order, data.len(), chip_id, ch_chunk_id);
+            let chunk_len = 2048 / 16;
+            println!(
+                "{} {}",
+                ch_chunk_id * chunk_len,
+                (ch_chunk_id + 1) * chunk_len
+            );
+
+            let mut dst_data = unsafe {
+                std::slice::from_raw_parts_mut(
+                    result[chip_id][ch_chunk_id * chunk_len..(ch_chunk_id + 1) * chunk_len].as_ptr()
+                        as *mut u8,
+                    1024,
+                )
+            };
+
+            dst_data.copy_from_slice(data);
+            cnt += 1;
+        }
+        if cnt == 128 {
+            Some(result)
+        } else {
+            None
+        }
+    }
+
+    pub fn fetch_fft_data(
+        &self,
+        tx: &mut DataLinkSender,
+        rx: &mut DataLinkReceiver,
+    ) -> Vec<Vec<Complex<i32>>> {
+        let mut result = vec![Vec::<Complex<i32>>::new(); 128];
+        for bid in 0..BOARD_NUM {
+            if let Some(x) = self.fetch_fft_data1(bid, tx, rx) {
+                for (d, s) in result[bid * 8..(bid + 1) * 8].iter_mut().zip(x.into_iter()) {
+                    *d = s;
+                }
+            } else {
+                println!("Error: no data fetched from board {}", bid);
+            }
+        }
+        result
     }
 }
