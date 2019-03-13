@@ -7,13 +7,12 @@ use pnet::datalink::{channel, Channel, ChannelType, Config};
 
 extern crate serde_yaml;
 use controller_rs::board_cfg::{BoardCfg};
-
-
 use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::str;
+use std::time::Duration;
 
 fn main() -> Result<(), std::io::Error> {
     let dev_name=env::args().nth(1).expect("Dev name not given");
@@ -22,7 +21,7 @@ fn main() -> Result<(), std::io::Error> {
     let net_cfg = Config {
         write_buffer_size: 65536,
         read_buffer_size: 65536,
-        read_timeout: None,
+        read_timeout: Some(Duration::from_millis(10)),
         write_timeout: None,
         channel_type: ChannelType::Layer2,
         bpf_fd_attempts: 1000,
