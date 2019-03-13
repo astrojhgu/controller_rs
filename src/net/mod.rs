@@ -45,7 +45,7 @@ pub fn send_raw_buffer(
             sub_buf[13] = (payload_len & 0xff) as u8;
             sub_buf[14] = msg_type;
             sub_buf[15..].copy_from_slice(&payload);
-            println!("len={}", sub_buf.len());
+            //println!("len={}", sub_buf.len());
             thread::sleep(Duration::from_millis(10));
             cap.sendpacket(&sub_buf[..])?
         }
@@ -75,7 +75,7 @@ pub fn send_udp_buffer(
     dst_port: u16,
     src_port: u16,
 ) -> Result<(), Error> {
-    println!("udp len={}", buf.len());
+    //println!("udp len={}", buf.len());
     //assert!(buf.len() >= 80);
     let builder = etherparse::PacketBuilder::ethernet2(src_mac, dst_mac)
         .ipv4(src_ip, dst_ip, 0xff)

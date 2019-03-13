@@ -298,6 +298,7 @@ impl BoardCfg {
 
     pub fn set_xgbeid(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
+            println!("Initializing xgbeid of board {}", i);
             let msg = AdcMsg::XGbeId(self.xgbeid[i]);
             send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
@@ -305,6 +306,7 @@ impl BoardCfg {
 
     pub fn set_fft_param(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
+            println!("setting fft params of board {}", i);
             let msg = AdcMsg::FftParam {
                 fft_shift: self.fft_shift,
                 truncation: self.truncation,
@@ -332,12 +334,15 @@ impl BoardCfg {
         //self.set_fft_param(cap);
         assert_eq!(value.len(), BOARD_NUM);
         for (bid, pf) in value.into_iter().enumerate() {
+            println!("uploading phase factor to board {}",bid); 
             self.update_phase_factor1(cap, bid, pf);
         }
         for bid in 0..BOARD_NUM {
+            println!("flipping phase factor of board {}",bid); 
             let msg = AdcMsg::Ctrl(CtrlParam::SwitchPhaseFactor);
             send_adc_msg(cap, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
         }
+        println!("enabling new phase factor");
         let msg = AdcMsg::MasterTrig;
         send_adc_msg(
             cap,
@@ -365,27 +370,33 @@ impl BoardCfg {
     }
 
     pub fn set_snap_xgbe_params(&self, cap: &mut Capture<Active>) {
+        println!("setting snap xgbe params");
         self.send_snap_msg(cap, Snap2Msg::XGbePortParams(self.snap_xgbe_params));
     }
 
     pub fn set_snap_app_params(&self, cap: &mut Capture<Active>) {
+        println!("uploading snap app params");
         self.send_snap_msg(cap, Snap2Msg::AppParam(self.snap_app_param));
     }
 
     pub fn turn_on_snap_xgbe(&self, cap: &mut Capture<Active>) {
+        println!("turnning on snap xgbe");
         self.send_snap_msg(cap, Snap2Msg::XGbePortOp(XGbePortOp::TurnOn));
     }
 
     pub fn turn_off_snap_xgbe(&self, cap: &mut Capture<Active>) {
+        println!("turnning off snap xgbe");
         self.send_snap_msg(cap, Snap2Msg::XGbePortOp(XGbePortOp::TurnOff));
     }
 
     pub fn reset_all(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
+            println!("reseting board {}", i);
             let msg = AdcMsg::Ctrl(CtrlParam::PreRst);
             send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error");
         }
 
+        println!("reseting master board, i.e., board {}", self.master_board_id);
         send_adc_msg(
             cap,
             &AdcMsg::MasterRst,
@@ -398,6 +409,7 @@ impl BoardCfg {
 
     pub fn set_adc_params(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
+            println!("setting adc param of board {}", i);
             let msg = AdcMsg::Cfg {
                 io_delay: self.io_delay[i],
                 packet_gap: self.packet_gap,
@@ -411,10 +423,13 @@ impl BoardCfg {
     }
 
     pub fn sync_adc(&self, cap: &mut Capture<Active>) {
+        println!("Syncing...");
         for i in 0..BOARD_NUM {
+            println!("reseting iddr of board {}", i);
             let msg = AdcMsg::Ctrl(CtrlParam::IddrRst);
             send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
+        println!("reseting master board, i.e., board {}", self.master_board_id);
         send_adc_msg(
             cap,
             &AdcMsg::MasterTrig,
@@ -424,9 +439,11 @@ impl BoardCfg {
         )
         .expect("sent error");
         for i in 0..BOARD_NUM {
+            println!("sync board {}", i);
             let msg = AdcMsg::Ctrl(CtrlParam::Synchronize);
             send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
+        println!("sync master board, i.e., board {}", self.master_board_id);
         send_adc_msg(
             cap,
             &AdcMsg::MasterSync,
@@ -439,12 +456,14 @@ impl BoardCfg {
 
     pub fn wait_for_trig(&self, cap: &mut Capture<Active>) {
         for i in 0..BOARD_NUM {
+            println!("preparing board {} for trig", i);
             let msg = AdcMsg::Ctrl(CtrlParam::StartFft);
             send_adc_msg(cap, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
     }
 
     pub fn send_internal_trig(&self, cap: &mut Capture<Active>) {
+        println!("asking master board, i.e., board {} to send internal trig sig", self.master_board_id);
         send_adc_msg(
             cap,
             &AdcMsg::MasterTrig,
