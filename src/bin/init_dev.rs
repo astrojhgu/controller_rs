@@ -13,6 +13,8 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::str;
+use std::thread;
+use std::time::Duration;
 
 fn main() -> Result<(), std::io::Error> {
     let mut cap = Capture::from_device(Device {
@@ -124,6 +126,10 @@ fn main() -> Result<(), std::io::Error> {
     bc.update_phase_factor(&mut cap, init_phase_factors);
 
     bc.wait_for_trig(&mut cap);
+
+    thread::sleep(Duration::from_millis(5000));
+
+    bc.send_internal_trig(&mut cap);
 
     Ok(())
 }

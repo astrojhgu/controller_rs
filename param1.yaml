@@ -173,7 +173,7 @@ xgbeid:
 packet_gap: 2000
 counter_wait: 639
 counter_sync: 10
-optical_delay: 17
+optical_delay: 1
 trig_out_delay: 5
 io_delay:
 - [0x06, 0x06, 0x06, 0x06]
@@ -193,9 +193,9 @@ io_delay:
 - [0x06, 0x06, 0x06, 0x06]
 - [0x06, 0x06, 0x06, 0x06]
 fft_shift: 2039
-truncation: 512
+truncation: 1
 master_board_id: 14
 src_mac: [0xec, 0x17, 0x2f, 0xc0, 0x5d, 0x70]
 src_ip: [100, 0, 0, 100]
-ch_beg: 400
-ch_end: 1640
+ch_beg: 512
+ch_end: 1536
