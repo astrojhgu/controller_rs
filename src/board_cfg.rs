@@ -58,6 +58,9 @@ impl BoardCfg {
         let ch_beg = param["ch_beg"].as_u64().expect("ch_beg err") as usize;
         let ch_end = param["ch_end"].as_u64().expect("ch_end err") as usize;
 
+        assert!(ch_beg % 2 == 0 && ch_beg < ch_end, "CH Asseration failed");
+        assert!(ch_end % 2 == 0 && ch_end <= 2048, "CH Asseration failed");
+
         let packet_gap = param["packet_gap"]
             .as_u64()
             .expect("Unable to get packet_gap") as u16;

@@ -51,7 +51,7 @@ fn main() -> Result<(), std::io::Error> {
     bc.set_adc_params(&mut *tx);
 
     thread::sleep(Duration::from_millis(500));
-    
+
     bc.turn_off_snap_xgbe(&mut *tx);
     thread::sleep(Duration::from_millis(500));
     bc.set_snap_xgbe_params(&mut *tx);
@@ -81,6 +81,6 @@ fn main() -> Result<(), std::io::Error> {
     thread::sleep(Duration::from_millis(2000));
 
     bc.send_internal_trig(&mut *tx);
-    
+
     Ok(())
 }

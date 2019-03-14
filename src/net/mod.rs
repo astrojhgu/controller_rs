@@ -87,8 +87,8 @@ pub fn send_udp_buffer(
         .write(&mut sub_buf, &buf)
         .expect("udp packet compose err");
     //cap.sendpacket(&sub_buf[..]).expect("sent error");
-    sub_buf[0x28]=0;//no checksum 
-    sub_buf[0x29]=0;
+    sub_buf[0x28] = 0; //no checksum
+    sub_buf[0x29] = 0;
     tx.send_to(&sub_buf[..], None).expect("error");
     Ok(())
 }
