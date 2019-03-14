@@ -71,7 +71,8 @@ fn main() -> Result<(), std::io::Error> {
 
     thread::sleep(Duration::from_millis(500));
 
-    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
+    //let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
+    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(16384, 0); 2048]; 8]; 16];
 
     bc.update_phase_factor(&mut *tx, init_phase_factors);
 
