@@ -479,7 +479,7 @@ impl BoardCfg {
 
     pub fn store_data(&self, tx: &mut DataLinkSender) {
         for i in 0..BOARD_NUM {
-            println!("prepare board {} to store data", i);
+            //println!("prepare board {} to store data", i);
             let msg = AdcMsg::Ctrl(CtrlParam::StoreData);
             send_adc_msg(tx, &msg, self.mac[i], self.src_mac, 1500).expect("sent error")
         }
@@ -504,14 +504,14 @@ impl BoardCfg {
         rx: &mut DataLinkReceiver,
     ) -> Option<Vec<Vec<Complex<i32>>>> {
         let result = vec![vec![Complex::<i32>::new(1, 1); 2048]; 8];
-        println!("fetching data from board {}", bid);
+        //println!("fetching data from board {}", bid);
         send_adc_msg(tx, &AdcMsg::UploadFft, self.mac[bid], self.src_mac, 1500)
             .expect("sent error");
 
         let mut cnt = 0;
         while let Ok(packet) = rx.next() {
             if packet.len() != 1024 + 12 + 2 + 4 + 1 {
-                println!("a");
+                //println!("a");
                 continue;
             }
             let src_mac = &packet[6..13];
@@ -530,12 +530,6 @@ impl BoardCfg {
 
             //println!("{} {} {} {}", data_order, data.len(), chip_id, ch_chunk_id);
             let chunk_len = 2048 / 16;
-            println!(
-                "{} {}",
-                ch_chunk_id * chunk_len,
-                (ch_chunk_id + 1) * chunk_len
-            );
-
             let mut dst_data = unsafe {
                 std::slice::from_raw_parts_mut(
                     result[chip_id][ch_chunk_id * chunk_len..(ch_chunk_id + 1) * chunk_len].as_ptr()

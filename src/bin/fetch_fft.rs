@@ -48,8 +48,8 @@ fn main() -> Result<(), std::io::Error> {
 
     bc.store_data(&mut *tx);
 
-    let fft_data = bc.fetch_fft_data(&mut *tx, &mut *rx);
-    println!("{:?}", fft_data[0]);
+    let _fft_data = bc.fetch_fft_data(&mut *tx, &mut *rx);
+    //println!("{:?}", fft_data[0]);
 
     Ok(())
 }
