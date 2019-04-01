@@ -63,7 +63,10 @@ pub fn send_adc_msg(
 ) -> Result<(), Error> {
     let msg_type = msg.msg_type_code();
     let buffer = msg.get_raw_data();
-    send_raw_buffer(tx, msg_type, &buffer, dst_mac, src_mac, mut_len)
+    for d in buffer {
+        send_raw_buffer(tx, msg_type, &d, dst_mac, src_mac, mut_len)?
+    }
+    Ok(())
 }
 
 pub fn send_udp_buffer(

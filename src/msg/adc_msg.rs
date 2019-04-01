@@ -3,7 +3,7 @@
 use num_complex::Complex;
 
 const PORT_PER_BOARD: usize = 8;
-const NUM_CH: usize = 2048;
+//const NUM_CH: usize = 2048;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum CtrlParam {
@@ -90,10 +90,9 @@ impl AdcMsg {
         }
     }
 
-    pub fn get_raw_data(&self) -> Vec<u8> {
-        let mut result = Vec::new();
-        result.append(&mut match *self {
-            AdcMsg::Ctrl(p) => vec![p.param_code()],
+    pub fn get_raw_data(&self) -> Vec<Vec<u8>> {
+        match *self {
+            AdcMsg::Ctrl(p) => vec![vec![p.param_code()]],
             AdcMsg::Cfg {
                 ref io_delay,
                 packet_gap,
@@ -112,7 +111,7 @@ impl AdcMsg {
                 result.push(trig_out_delay);
                 result.push(optical_delay);
                 result.append(&mut vec![0; 89]); //make it compatible to GUI App
-                result
+                vec![result]
             }
             AdcMsg::FftParam {
                 fft_shift,
@@ -127,19 +126,31 @@ impl AdcMsg {
                     ((truncation >> 24) & 0x0000_00ff) as u8,
                 ];
                 result.append(&mut vec![0; 94]);
-                result
+                vec![result]
             }
             AdcMsg::PhaseFactor { ref value } => {
-                let mut data = Vec::<i16>::new();
+                let mut result = Vec::new();
                 for i in 0..PORT_PER_BOARD {
-                    for j in 0..NUM_CH {
-                        data.push(value[i][j].im);
-                        data.push(value[i][j].re);
+                    for n in 0..8 {
+                        let mut phase_data = Vec::<i16>::new();
+                        for j in n * 256..(n + 1) * 256 {
+                            phase_data.push(value[i][j].im);
+                            phase_data.push(value[i][j].re);
+                        }
+                        let phase_data = phase_data.into_boxed_slice();
+                        let cap = phase_data.len() * 2;
+                        let mut phase_data = unsafe {
+                            Vec::from_raw_parts(Box::into_raw(phase_data) as *mut u8, cap, cap)
+                        };
+                        let mut data = vec![i as u8];
+                        let addr: [u8; 2] = unsafe { std::mem::transmute((n * 1024) as u16) };
+                        data.push(addr[0]);
+                        data.push(addr[1]);
+                        data.append(&mut phase_data);
+                        result.push(data);
                     }
                 }
-                let data = data.into_boxed_slice();
-                let cap = data.len() * 2;
-                unsafe { Vec::from_raw_parts(Box::into_raw(data) as *mut u8, cap, cap) }
+                result
             }
             //&AdcMsg::XGbeId { ref value } => value.clone(),
             AdcMsg::XGbeId(XGbeIdParam::Upper { ref mac1, ref mac2 }) => {
@@ -151,7 +162,7 @@ impl AdcMsg {
                     result.push(x);
                 });
                 result.append(&mut vec![0; 88]);
-                result
+                vec![result]
             }
             AdcMsg::XGbeId(XGbeIdParam::Lower {
                 ref mac1,
@@ -187,13 +198,12 @@ impl AdcMsg {
                 result.push((port2 & 0xff_u16) as u8);
                 result.push(((port2 >> 8) & 0xff_u16) as u8);
                 result.append(&mut vec![0; 64]);
-                result
+                vec![result]
             }
-            AdcMsg::MasterRst => vec![0x01; 10],
-            AdcMsg::MasterTrig => vec![0x01; 10],
-            AdcMsg::MasterSync => vec![0x01; 10],
-            _ => vec![],
-        });
-        result
+            AdcMsg::MasterRst => vec![vec![0x01; 10]],
+            AdcMsg::MasterTrig => vec![vec![0x01; 10]],
+            AdcMsg::MasterSync => vec![vec![0x01; 10]],
+            _ => vec![vec![]],
+        }
     }
 }

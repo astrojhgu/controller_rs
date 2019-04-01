@@ -178,8 +178,7 @@ impl BoardCfg {
                         port2,
                     }
                 }
-            })
-            .collect();
+            }).collect();
         let mut io_delay = [[0_u8; ADC_PER_BOARD]; BOARD_NUM];
 
         param["io_delay"]
@@ -359,8 +358,7 @@ impl BoardCfg {
             self.src_ip,
             self.ctrl_dst_port,
             self.ctrl_src_port,
-        )
-        .expect("sent error");
+        ).expect("sent error");
     }
 
     pub fn set_snap_xgbe_params(&self, tx: &mut DataLinkSender) {
@@ -400,8 +398,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        )
-        .expect("sent error");
+        ).expect("sent error");
     }
 
     pub fn set_adc_params(&self, tx: &mut DataLinkSender) {
@@ -436,8 +433,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        )
-        .expect("sent error");
+        ).expect("sent error");
         for i in 0..BOARD_NUM {
             println!("sync board {}", i);
             let msg = AdcMsg::Ctrl(CtrlParam::Synchronize);
@@ -450,8 +446,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        )
-        .expect("sent error");
+        ).expect("sent error");
     }
 
     pub fn wait_for_trig(&self, tx: &mut DataLinkSender) {
@@ -473,8 +468,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        )
-        .expect("sent error");
+        ).expect("sent error");
     }
 
     pub fn store_data(&self, tx: &mut DataLinkSender) {
@@ -493,8 +487,7 @@ impl BoardCfg {
             self.mac[self.master_board_id],
             self.src_mac,
             1500,
-        )
-        .expect("sent error");
+        ).expect("sent error");
     }
 
     pub fn fetch_fft_data1(
