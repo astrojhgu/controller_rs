@@ -496,7 +496,7 @@ impl BoardCfg {
         tx: &mut DataLinkSender,
         rx: &mut DataLinkReceiver,
     ) -> Option<Vec<Vec<Complex<i32>>>> {
-        let result = vec![vec![Complex::<i32>::new(1, 1); 2048]; 8];
+        let mut result = vec![vec![Complex::<i32>::new(1, 1); 2048]; 8];
         //println!("fetching data from board {}", bid);
         send_adc_msg(tx, &AdcMsg::UploadFft, self.mac[bid], self.src_mac, 1500)
             .expect("sent error");
@@ -535,6 +535,9 @@ impl BoardCfg {
             cnt += 1;
         }
         if cnt == 128 {
+            result
+                .iter_mut()
+                .for_each(|s| s.iter_mut().for_each(|d| *d = Complex::new(d.im, d.re)));
             Some(result)
         } else {
             None
@@ -545,17 +548,19 @@ impl BoardCfg {
         &self,
         tx: &mut DataLinkSender,
         rx: &mut DataLinkReceiver,
-    ) -> Vec<Vec<Complex<i32>>> {
-        let mut result = vec![Vec::<Complex<i32>>::new(); 128];
-        for bid in 0..BOARD_NUM {
+    ) -> Option<Vec<Vec<Complex<i32>>>> {
+        let board_ids: Vec<usize> = (0..BOARD_NUM).collect();
+        let mut result = vec![Vec::<Complex<i32>>::new(); board_ids.len() * 8];
+        for (i, bid) in board_ids.into_iter().enumerate() {
             if let Some(x) = self.fetch_fft_data1(bid, tx, rx) {
-                for (d, s) in result[bid * 8..(bid + 1) * 8].iter_mut().zip(x.into_iter()) {
+                for (d, s) in result[i * 8..(i + 1) * 8].iter_mut().zip(x.into_iter()) {
                     *d = s;
                 }
             } else {
                 println!("Error: no data fetched from board {}", bid);
+                return None;
             }
         }
-        result
+        Some(result)
     }
 }

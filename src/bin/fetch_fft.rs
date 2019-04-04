@@ -11,9 +11,9 @@ use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::io::Write;
 use std::str;
 use std::time::Duration;
-
 fn main() -> Result<(), std::io::Error> {
     let dev_name = env::args().nth(1).expect("Dev name not given");
     let dev = interfaces()
@@ -48,8 +48,20 @@ fn main() -> Result<(), std::io::Error> {
 
     bc.store_data(&mut *tx);
 
-    let _fft_data = bc.fetch_fft_data(&mut *tx, &mut *rx);
-    //println!("{:?}", fft_data[0]);
-
-    Ok(())
+    if let Some(fft_data) = bc.fetch_fft_data(&mut *tx, &mut *rx) {
+        let mut outfile = File::create("fft_data.dat").unwrap();
+        for v in &fft_data {
+            let nbytes = v.len() * 8;
+            let raw_data = unsafe { std::slice::from_raw_parts(v.as_ptr() as *const u8, nbytes) };
+            //println!("{} {}", nbytes, v.len());
+            outfile.write_all(raw_data);
+        }
+        println!("{}", fft_data.len());
+        Ok(())
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "data incomplete",
+        ))
+    }
 }

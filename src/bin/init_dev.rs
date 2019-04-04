@@ -47,7 +47,14 @@ fn main() -> Result<(), std::io::Error> {
     let bc = BoardCfg::from_yaml(&param);
 
     bc.reset_all(&mut *tx);
+
     bc.sync_adc(&mut *tx);
+    thread::sleep(Duration::from_millis(1000));
+    bc.sync_adc(&mut *tx);
+    thread::sleep(Duration::from_millis(1000));
+    bc.sync_adc(&mut *tx);
+    thread::sleep(Duration::from_millis(1000));
+
     bc.set_adc_params(&mut *tx);
 
     thread::sleep(Duration::from_millis(500));
