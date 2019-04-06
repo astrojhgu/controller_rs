@@ -45,10 +45,11 @@ cfg_name=sys.argv[2]
 spec_data=np.array([[0. for i in range(0,nch)] for i in range(nports)])
 fft_data=np.array([[0.+0.0j for i in range(0,nch)] for i in range(nports)])
 corr_data=np.array([[0.+0.0j for i in range(0,nch)] for i in range(nports)])
-
-
+mean_fft_data=np.array([[0.+0.0j for i in range(0,nch)] for i in range(nports)])
+mean_k=0.9
 
 update_ratio=0.9
+fft_update_ratio=0.99
 
 gs=GridSpec(ports_per_board,nboards)
 gs.update(hspace=0, wspace=0)
@@ -71,10 +72,12 @@ while True:
     ndata=len(raw_data)/4 # 4 bytes each integer
     raw_data=np.array(struct.unpack("={0}i".format(ndata), raw_data))
     fft_data=(raw_data[1::2]+raw_data[::2]*1j).reshape([nports,-1])
+    mean_fft_data=fft_update_ratio*mean_fft_data+(1.0-fft_update_ratio)*fft_data
     spec_data+=np.real(fft_data*np.conj(fft_data))
-    corr_data=corr_data*update_ratio+(1.-update_ratio)*calc_corr(fft_data, 0)
+    corr_data=corr_data*update_ratio+(1.-update_ratio)*calc_corr(fft_data, 7)
     cnt+=1
     if cnt%10==0:
+        
         print("plotting")
         ymax=10*np.max(np.log10(spec_data[spec_data>0]))
         ymin=10*np.min(np.log10(spec_data[spec_data>0]))
@@ -110,7 +113,7 @@ while True:
         ymin*=1.1
         ymax=max(ymax, abs(ymin))
         ymin=-ymax
-        
+        print(ymin,ymax)
         fig=plt.figure(figsize=(40,20))
 
         for j in range(nboards):
@@ -128,6 +131,31 @@ while True:
         plt.tight_layout()
         plt.savefig('corr.png')
         print("fig2 saved")
+        plt.close()
+        fig=plt.figure(figsize=(40,20))
+        ymax=max(np.max(mean_fft_data.real),np.max(mean_fft_data.imag))
+        ymin=min(np.min(mean_fft_data.real),np.min(mean_fft_data.imag))
+        ymax*=1.1
+        ymin*=1.1
+        ymax=max(ymax, abs(ymin))
+        ymin=-ymax
+        print(ymin,ymax)
+        for j in range(nboards):
+            print("ploting board {0}".format(j))
+            for i in range(ports_per_board):
+                bid=j
+                cid=i
+                port_id=bid*ports_per_board+cid
+                ax=plt.subplot(gs[i,j])
+                ax.set_ylim(ymin, ymax)
 
+                hide_tick_labels(ax, hide_x=True, hide_y=True)
+                ax.plot(mean_fft_data[port_id,:].real, linewidth=0.5)
+                ax.plot(np.zeros_like(mean_fft_data[port_id,:]), linewidth=0.5)
+                #ax.plot(mean_fft_data[port_id,:].imag,'.')
+        plt.tight_layout()
+        plt.savefig('mean_fft.png')
+        print("fig3 saved")
+        plt.close()
         request=subprocess.Popen(cmd)
 
