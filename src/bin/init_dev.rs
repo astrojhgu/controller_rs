@@ -47,15 +47,13 @@ fn main() -> Result<(), std::io::Error> {
     let bc = BoardCfg::from_yaml(&param);
 
     bc.reset_all(&mut *tx);
+    thread::sleep(Duration::from_millis(2000));
+
+    bc.sync_adc(&mut *tx);
+    thread::sleep(Duration::from_millis(2000));
+    bc.sync_adc(&mut *tx);
+    thread::sleep(Duration::from_millis(2000));
     
-    bc.sync_adc(&mut *tx);
-    thread::sleep(Duration::from_millis(2000));
-    bc.sync_adc(&mut *tx);
-    thread::sleep(Duration::from_millis(2000));
-    bc.sync_adc(&mut *tx);
-    thread::sleep(Duration::from_millis(2000));
-
-
     bc.set_adc_params(&mut *tx);
     
     thread::sleep(Duration::from_millis(500));
@@ -80,17 +78,20 @@ fn main() -> Result<(), std::io::Error> {
     thread::sleep(Duration::from_millis(500));
 
     //let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
-    let init_phase_factors = vec![vec![vec![Complex::<i16>::new(16384, 0); 2048]; 8]; 16];
-    //let mut init_phase_factors = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
+    //let mut init_phase_factors = vec![vec![vec![Complex::<i16>::new(16384, 0); 2048]; 8]; 16];
+    let mut init_phase_factors = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
     //init_phase_factors[0][7].iter_mut().for_each(|x:&mut Complex<i16>|{*x=Complex::new(16384,0)});
-    /*
+    
     for b in &mut init_phase_factors[0..1]{
-        for p in &mut b[7..8]{
-            for c in p{
-                *c=Complex::new(16384,0);
+        for p in &mut b[0..1]{        
+            for (ch,c) in p.iter_mut().enumerate(){
+                //*c=Complex::new(0,0);
+                if(ch%2==0){
+                    *c=Complex::<i16>::new(16384, 16384);
+                }
             }
         }
-    }*/
+    }
 
 
     bc.update_phase_factor(&mut *tx, init_phase_factors);

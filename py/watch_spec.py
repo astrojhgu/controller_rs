@@ -58,6 +58,8 @@ request=subprocess.Popen(cmd)
 
 cnt=0
 
+ref_port=int(sys.argv[3])
+
 print(spec_data.shape)
 while True:
     #request=subprocess.Popen(["../target/release/fetch_fft", dev_name, cfg_name])
@@ -74,7 +76,7 @@ while True:
     fft_data=(raw_data[1::2]+raw_data[::2]*1j).reshape([nports,-1])
     mean_fft_data=fft_update_ratio*mean_fft_data+(1.0-fft_update_ratio)*fft_data
     spec_data+=np.real(fft_data*np.conj(fft_data))
-    corr_data=corr_data*update_ratio+(1.-update_ratio)*calc_corr(fft_data, 7)
+    corr_data=corr_data*update_ratio+(1.-update_ratio)*calc_corr(fft_data, ref_port)
     cnt+=1
     if cnt%10==0:
         
