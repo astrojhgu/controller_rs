@@ -53,7 +53,7 @@ fft_update_ratio=0.99
 
 gs=GridSpec(ports_per_board,nboards)
 gs.update(hspace=0, wspace=0)
-cmd=["../target/release/fetch_fft", dev_name, cfg_name]
+cmd=["../target/debug/fetch_fft", dev_name, cfg_name]
 request=subprocess.Popen(cmd)
 
 cnt=0
@@ -62,7 +62,7 @@ ref_port=int(sys.argv[3])
 
 print(spec_data.shape)
 while True:
-    #request=subprocess.Popen(["../target/release/fetch_fft", dev_name, cfg_name])
+    #request=subprocess.Popen(["../target/debug/fetch_fft", dev_name, cfg_name])
     request.wait()
     request.communicate()
     rc=request.returncode

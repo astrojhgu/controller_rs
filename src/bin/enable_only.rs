@@ -60,7 +60,7 @@ fn main() {
     let bc = BoardCfg::from_yaml(&param);
 
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
-    pf[bid][pid] = vec![Complex::<i16>::new(1, 0); 2048];
+    pf[bid][pid] = vec![Complex::<i16>::new(16384, 0); 2048];
 
     bc.update_phase_factor(&mut *tx, pf);
 }

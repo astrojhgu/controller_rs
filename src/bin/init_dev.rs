@@ -88,9 +88,9 @@ fn main() -> Result<(), std::io::Error> {
     for b in &mut init_phase_factors[0..16]{
         for p in &mut b[0..8]{        
             for (ch,c) in p.iter_mut().enumerate(){
-                *c=Complex::new(1,0);
+                //*c=Complex::new(1,0);
                 //if(ch%2==0){
-                //    *c=Complex::<i16>::new(16384, 16384);
+                *c=Complex::<i16>::new(16384, 0);
                 //}
             }
         }

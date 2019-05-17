@@ -28,7 +28,7 @@ pub fn send_raw_buffer(
         sub_buf[12] = ((payload_len >> 8) & 0xff) as u8;
         sub_buf[13] = (payload_len & 0xff) as u8;
         sub_buf[14] = msg_type;
-        thread::sleep(Duration::from_millis(20));
+        thread::sleep(Duration::from_millis(1));
         //cap.sendpacket(&sub_buf[..])?
         tx.send_to(&sub_buf[..], None).expect("send error");
     } else {
@@ -46,7 +46,7 @@ pub fn send_raw_buffer(
             sub_buf[14] = msg_type;
             sub_buf[15..].copy_from_slice(&payload);
             //println!("len={}", sub_buf.len());
-            thread::sleep(Duration::from_millis(20));
+            thread::sleep(Duration::from_millis(1));
             //cap.sendpacket(&sub_buf[..])?
             tx.send_to(&sub_buf[..], None).expect("send error");
         }
