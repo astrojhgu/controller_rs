@@ -342,9 +342,9 @@ impl BoardCfg {
             send_adc_msg(tx, &msg, self.mac[bid], self.src_mac, 1500).expect("sent error");
         }
         println!("enabling new phase factor");
-        let msg = AdcMsg::MasterTrig;
-        send_adc_msg(tx, &msg, self.mac[self.master_board_id], self.src_mac, 1500)
-            .expect("sent error");
+        //let msg = AdcMsg::MasterTrig;
+        //send_adc_msg(tx, &msg, self.mac[self.master_board_id], self.src_mac, 1500)
+        //    .expect("sent error");
     }
 
     pub fn send_snap_msg(&self, tx: &mut DataLinkSender, msg: Snap2Msg) {

@@ -99,12 +99,12 @@ fn main() -> Result<(), std::io::Error> {
 
 
     bc.update_phase_factor(&mut *tx, init_phase_factors);
-    
+    bc.send_internal_trig(&mut *tx);
     bc.wait_for_trig(&mut *tx);
 
     thread::sleep(Duration::from_millis(2000));
 
-    bc.send_internal_trig(&mut *tx);
+    //bc.send_internal_trig(&mut *tx);
 
     Ok(())
 }
