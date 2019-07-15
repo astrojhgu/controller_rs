@@ -17,17 +17,6 @@ use num_complex::Complex;
 use controller_rs::board_cfg::BoardCfg;
 
 fn main() {
-    let bid: usize = env::args()
-        .nth(1)
-        .expect("bid miss")
-        .parse()
-        .expect("bad bid");
-    let pid: usize = env::args()
-        .nth(2)
-        .expect("pid miss")
-        .parse()
-        .expect("bad pid");
-
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
     for b in &mut pf[0..16]{
         for p in &mut b[0..8]{
