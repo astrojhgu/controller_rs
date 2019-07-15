@@ -29,7 +29,7 @@ fn main() {
         }
     }
 
-    let mut phase_file=File::create(env::args().nth(3).expect("out file name not given")).expect("Failed to create phase file");
+    let mut phase_file=File::create(env::args().nth(1).expect("out file name not given")).expect("Failed to create phase file");
 
     for bid in 0..16{
         for pid in 0..8{
