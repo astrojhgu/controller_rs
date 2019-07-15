@@ -83,8 +83,9 @@ fn main() -> Result<(), std::io::Error> {
     //let init_phase_factors = vec![vec![vec![Complex::<i16>::new(1, 0); 2048]; 8]; 16];
     //let mut init_phase_factors = vec![vec![vec![Complex::<i16>::new(16384, 0); 2048]; 8]; 16];
     let mut init_phase_factors = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
-    //init_phase_factors[0][7].iter_mut().for_each(|x:&mut Complex<i16>|{*x=Complex::new(16384,0)});
-    
+    //init_phase_factors[0][1].iter_mut().for_each(|x:&mut Complex<i16>|{*x=Complex::new(16384,0)});
+
+    if true{
     for b in &mut init_phase_factors[0..16]{
         for p in &mut b[0..8]{        
             for (ch,c) in p.iter_mut().enumerate(){
@@ -94,7 +95,7 @@ fn main() -> Result<(), std::io::Error> {
                 //}
             }
         }
-    }
+    }}
 
 
     bc.update_phase_factor(&mut *tx, init_phase_factors);

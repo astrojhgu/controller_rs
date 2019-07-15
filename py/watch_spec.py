@@ -32,9 +32,10 @@ def calc_corr(fft_data, ref_port_id):
     result=np.zeros_like(fft_data, dtype='complex')
     for i in range(0, fft_data.shape[0]):
         #print("calculating port {0}".format(i))
-        result[i,:]=fft_data[i, :]*np.conj(fft_data[ref_port_id, :])
+        result[i,:]=(fft_data[i, :])*np.conj(fft_data[ref_port_id, :])
     #print("fsdfa:{0}".format((fft_data[127,:]==fft_data[135,:]).all()))
     #print("*****:{0}".format((result[127,:]==result[135,:]).all()))
+    #result[:, result.shape[1]/2]=0
     return result
 
 
@@ -100,7 +101,7 @@ while True:
                 hide_tick_labels(ax, hide_x=True, hide_y=True)
                 ax.set_ylim(ymin,ymax)
                 ax.set_xlim(-1, 2050)
-                ax.plot(10*np.log10(spec_data[port_id,:]))
+                ax.plot(10*np.log10(spec_data[port_id,:]), linewidth=0.5)
 
         plt.tight_layout()
         plt.savefig('auto.png')
@@ -109,8 +110,10 @@ while True:
 
         plt.close()
 
-        ymax=max(np.max(corr_data.real),np.max(corr_data.imag))
-        ymin=min(np.min(corr_data.real),np.min(corr_data.imag))
+        #ymax=max(np.max(corr_data.real),np.max(corr_data.imag))
+        #ymin=min(np.min(corr_data.real),np.min(corr_data.imag))
+        ymax=max(np.std(corr_data.real)*5, np.std(corr_data.imag)*5)
+        ymin=-ymax
         ymax*=1.1
         ymin*=1.1
         ymax=max(ymax, abs(ymin))
@@ -128,11 +131,35 @@ while True:
                 ax.set_ylim(ymin, ymax)
 
                 hide_tick_labels(ax, hide_x=True, hide_y=True)
-                ax.plot(corr_data[port_id,:].real)
-                ax.plot(corr_data[port_id,:].imag,'.')
+                ax.plot(corr_data[port_id,:].real, linewidth=0.5)
+                ax.plot(corr_data[port_id,:].imag,'.', markersize=0.5)
         plt.tight_layout()
         plt.savefig('corr.png')
         print("fig2 saved")
+
+        print("plotting")
+        ymax=np.pi
+        ymin=-np.pi
+        print(ymin, ymax)
+
+        plt.close()
+        fig=plt.figure(figsize=(40,20))
+        for j in range(nboards):
+            print("ploting board {0}".format(j));
+            for i in range(ports_per_board):
+                bid=j
+                cid=i
+                port_id=bid*ports_per_board+cid
+                ax=plt.subplot(gs[i,j])
+                hide_tick_labels(ax, hide_x=True, hide_y=True)
+                ax.set_ylim(ymin,ymax)
+                ax.set_xlim(-1, 2050)
+                ax.plot(np.angle(corr_data[port_id,:]), linewidth=0.5)
+
+        plt.tight_layout()
+        plt.savefig('args.png')
+        print("fig2.5 saved")
+        #spec_data*=0.0
         plt.close()
         fig=plt.figure(figsize=(40,20))
         ymax=max(np.max(mean_fft_data.real),np.max(mean_fft_data.imag))
@@ -152,8 +179,8 @@ while True:
                 ax.set_ylim(ymin, ymax)
 
                 hide_tick_labels(ax, hide_x=True, hide_y=True)
-                ax.plot(mean_fft_data[port_id,:].real, linewidth=0.5)
-                ax.plot(np.zeros_like(mean_fft_data[port_id,:]), linewidth=0.5)
+                ax.plot(mean_fft_data[port_id,:].real, linewidth=2.5)
+                ax.plot(np.zeros_like(mean_fft_data[port_id,:]), linewidth=2.5)
                 #ax.plot(mean_fft_data[port_id,:].imag,'.')
         plt.tight_layout()
         plt.savefig('mean_fft.png')
