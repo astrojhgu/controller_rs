@@ -31,15 +31,15 @@ fn main() {
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
     pf[bid][pid] = vec![Complex::<i16>::new(16384, 0); 2048];
 
-    let mut phase_file=File::create(env::args().nth(3).expect("out file name not given")).expect("Failed to create phase file");
+    let mut phase_file = File::create(env::args().nth(3).expect("out file name not given"))
+        .expect("Failed to create phase file");
 
-    for bid in 0..16{
-        for pid in 0..8{
-            let raw = unsafe {
-                std::slice::from_raw_parts(pf[bid][pid].as_ptr() as *const u8, 2048*4)
-            };
+    for bid in 0..16 {
+        for pid in 0..8 {
+            let raw =
+                unsafe { std::slice::from_raw_parts(pf[bid][pid].as_ptr() as *const u8, 2048 * 4) };
             match phase_file.write(raw) {
-                Ok(s) if s == 2048*4 => {},
+                Ok(s) if s == 2048 * 4 => {}
                 _ => panic!("Error in writing phase file"),
             }
         }

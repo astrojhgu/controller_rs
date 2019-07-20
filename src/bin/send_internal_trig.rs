@@ -46,7 +46,6 @@ fn main() -> Result<(), std::io::Error> {
     let param = from_str::<Value>(&msg_str).expect("Unable to read param");
     let bc = BoardCfg::from_yaml(&param);
 
-    
     bc.send_internal_trig(&mut *tx);
 
     Ok(())

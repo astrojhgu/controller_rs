@@ -6,12 +6,12 @@ extern crate serde_yaml;
 use pnet::datalink::interfaces;
 use pnet::datalink::{channel, Channel, ChannelType, Config};
 
+use num_complex::Complex;
 use serde_yaml::{from_str, Value};
 use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::str;
-use num_complex::Complex;
 
 use controller_rs::board_cfg::BoardCfg;
 
@@ -40,8 +40,8 @@ fn main() {
             panic!();
         };
 
-    let mut phase_file=File::open(env::args().nth(3).expect("phase file not given")).expect("phase file open failed");
-
+    let mut phase_file = File::open(env::args().nth(3).expect("phase file not given"))
+        .expect("phase file open failed");
 
     let mut fparam = File::open(env::args().nth(2).unwrap()).unwrap();
     let mut bytes = Vec::new();
@@ -52,13 +52,13 @@ fn main() {
 
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
 
-    for bid in 0..16{
-        for pid in 0..8{
+    for bid in 0..16 {
+        for pid in 0..8 {
             let raw = unsafe {
-                std::slice::from_raw_parts_mut(pf[bid][pid].as_mut_ptr() as *mut u8, 2048*4)
+                std::slice::from_raw_parts_mut(pf[bid][pid].as_mut_ptr() as *mut u8, 2048 * 4)
             };
             match phase_file.read(raw) {
-                Ok(s) if s == 2048*4 => {},
+                Ok(s) if s == 2048 * 4 => {}
                 _ => panic!("Error in read phase file"),
             }
         }
@@ -67,5 +67,5 @@ fn main() {
     //pf[bid][pid] = vec![Complex::<i16>::new(16384, 0); 2048];
 
     bc.update_phase_factor(&mut *tx, pf);
-    //bc.send_internal_trig(&mut *tx);    
+    //bc.send_internal_trig(&mut *tx);
 }

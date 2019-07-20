@@ -63,5 +63,5 @@ fn main() {
     pf[bid][pid] = vec![Complex::<i16>::new(16384, 0); 2048];
 
     bc.update_phase_factor(&mut *tx, pf);
-    //bc.send_internal_trig(&mut *tx);    
+    //bc.send_internal_trig(&mut *tx);
 }
