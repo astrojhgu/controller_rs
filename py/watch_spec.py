@@ -80,6 +80,30 @@ while True:
     corr_data=corr_data*update_ratio+(1.-update_ratio)*calc_corr(fft_data, ref_port)
     cnt+=1
     if cnt%10==0:
+
+        print("plotting")
+        ymax=180
+        ymin=-180
+        print(ymin, ymax)
+
+        plt.close()
+        fig=plt.figure(figsize=(40,20))
+        for j in range(nboards):
+            print("ploting board {0}".format(j));
+            for i in range(ports_per_board):
+                bid=j
+                cid=i
+                port_id=bid*ports_per_board+cid
+                ax=plt.subplot(gs[i,j])
+                hide_tick_labels(ax, hide_x=True, hide_y=True)
+                ax.set_ylim(ymin,ymax)
+                ax.set_xlim(-1, 2050)
+                ax.plot(np.degrees(np.angle(corr_data[port_id,:])), linewidth=0.5)
+
+        plt.tight_layout()
+        plt.savefig('args.png')
+        print("fig2.5 saved")
+
         
         print("plotting")
         ymax=10*np.max(np.log10(spec_data[spec_data>0]))
@@ -137,28 +161,6 @@ while True:
         plt.savefig('corr.png')
         print("fig2 saved")
 
-        print("plotting")
-        ymax=np.pi
-        ymin=-np.pi
-        print(ymin, ymax)
-
-        plt.close()
-        fig=plt.figure(figsize=(40,20))
-        for j in range(nboards):
-            print("ploting board {0}".format(j));
-            for i in range(ports_per_board):
-                bid=j
-                cid=i
-                port_id=bid*ports_per_board+cid
-                ax=plt.subplot(gs[i,j])
-                hide_tick_labels(ax, hide_x=True, hide_y=True)
-                ax.set_ylim(ymin,ymax)
-                ax.set_xlim(-1, 2050)
-                ax.plot(np.angle(corr_data[port_id,:]), linewidth=0.5)
-
-        plt.tight_layout()
-        plt.savefig('args.png')
-        print("fig2.5 saved")
         #spec_data*=0.0
         plt.close()
         fig=plt.figure(figsize=(40,20))

@@ -194,8 +194,9 @@ io_delay:
 - [0x04, 0x04, 0x04, 0x04]
 - [0x04, 0x04, 0x04, 0x04]
 #fft_shift: 0b001000100010
-fft_shift: 0b010010010010
-truncation: 2
+#fft_shift: 0b010010010010
+fft_shift: 0b100000100000
+truncation: 1024
 #fft_shift: 0
 #truncation: 2
 master_board_id: 14

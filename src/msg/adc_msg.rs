@@ -134,8 +134,10 @@ impl AdcMsg {
                     for n in 0..8 {
                         let mut phase_data = Vec::<i16>::new();
                         for j in n * 256..(n + 1) * 256 {
-                            phase_data.push(value[i][j].im);
+                            //phase_data.push(value[i][j].im);
+                            //phase_data.push(value[i][j].re);
                             phase_data.push(value[i][j].re);
+                            phase_data.push(value[i][j].im);
                         }
                         let phase_data = phase_data.into_boxed_slice();
                         let cap = phase_data.len() * 2;
