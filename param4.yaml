@@ -1,5 +1,4 @@
 snap2:
-  #mac: [0x0e, 0x00, 0x56, 0xe6, 0x46, 0xde]
   mac:  [0x0F, 0x00, 0xF0, 0x21, 0x46, 0xD7]  
   ip: [100, 0, 0, 201]
   ctrl_src_port: 1354
@@ -194,17 +193,20 @@ io_delay:
 - [0x05, 0x05, 0x05, 0x05]
 - [0x05, 0x05, 0x05, 0x05]
 - [0x05, 0x05, 0x05, 0x05]
-#fft_shift: 0b010010010010
+fft_shift: 0b010010010010
 #fft_shift: 0b010101010101
 #fft_shift:  0b100010001000
 fft_shift:  0b100000100000
-truncation: 1024
+#fft_shift:  0b000000000000
+truncation: 2
 #fft_shift: 0
 #truncation: 2
 master_board_id: 14
 src_mac: [0xec, 0x17, 0x2f, 0xc0, 0x5d, 0x70]
 src_ip: [100, 0, 0, 100]
-ch_beg: 512
-ch_end: 1536
+#ch_beg: 512
+#ch_end: 1536
+ch_beg: 368
+ch_end: 1680
 #ch_beg: 10
 #ch_end: 1034

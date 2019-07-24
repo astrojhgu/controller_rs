@@ -205,6 +205,7 @@ impl AdcMsg {
             AdcMsg::MasterRst => vec![vec![0x01; 10]],
             AdcMsg::MasterTrig => vec![vec![0x01; 10]],
             AdcMsg::MasterSync => vec![vec![0x01; 10]],
+            AdcMsg::UploadFft => vec![vec![0x01; 10]],
             _ => vec![vec![]],
         }
     }

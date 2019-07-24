@@ -99,6 +99,7 @@ while True:
                 ax.set_ylim(ymin,ymax)
                 ax.set_xlim(-1, 2050)
                 ax.plot(np.degrees(np.angle(corr_data[port_id,:])), linewidth=0.5)
+                ax.text(1000, ymin+0.8*(ymax-ymin), '{0}/{1} {2}'.format(j, i, j*8+i), fontsize=20)
 
         plt.tight_layout()
         plt.savefig('args.png')
@@ -126,6 +127,7 @@ while True:
                 ax.set_ylim(ymin,ymax)
                 ax.set_xlim(-1, 2050)
                 ax.plot(10*np.log10(spec_data[port_id,:]), linewidth=0.5)
+                ax.text(1000, ymin+0.8*(ymax-ymin), '{0}/{1} {2}'.format(j, i, j*8+i), fontsize=20)
 
         plt.tight_layout()
         plt.savefig('auto.png')
@@ -157,6 +159,7 @@ while True:
                 hide_tick_labels(ax, hide_x=True, hide_y=True)
                 ax.plot(corr_data[port_id,:].real, linewidth=0.5)
                 ax.plot(corr_data[port_id,:].imag,'.', markersize=0.5)
+                ax.text(1000, ymin+0.8*(ymax-ymin), '{0}/{1} {2}'.format(j, i, j*8+i), fontsize=20)
         plt.tight_layout()
         plt.savefig('corr.png')
         print("fig2 saved")
@@ -182,7 +185,9 @@ while True:
 
                 hide_tick_labels(ax, hide_x=True, hide_y=True)
                 ax.plot(mean_fft_data[port_id,:].real, linewidth=2.5)
-                ax.plot(np.zeros_like(mean_fft_data[port_id,:]), linewidth=2.5)
+                ax.plot(mean_fft_data[port_id,:].imag, linewidth=2.5)
+                #ax.plot(np.zeros_like(mean_fft_data[port_id,:]), linewidth=2.5)
+                ax.text(1000, ymin+0.8*(ymax-ymin), '{0}/{1} {2}'.format(j, i, j*8+i), fontsize=20)
                 #ax.plot(mean_fft_data[port_id,:].imag,'.')
         plt.tight_layout()
         plt.savefig('mean_fft.png')
