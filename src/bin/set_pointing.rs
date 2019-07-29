@@ -38,12 +38,12 @@ fn main() {
     let mut pf = vec![vec![vec![Complex::<i16>::new(0, 0); 2048]; 8]; 16];
     let mut aid = 0;
 
-    for b in &mut pf[0..16] {
+    for (i, b) in pf[0..16].iter_mut().enumerate() {
         for p in &mut b[0..8] {
             if aid >= ants.len() {
                 break;
             }
-            if aid % 8 == 0 {
+            if aid % 8 == 0 /*|| aid < 86*/ {
                 aid += 1;
                 continue;
             }

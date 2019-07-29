@@ -60,17 +60,17 @@ snap2:
     dst_ip:  [0x0a, 0x00, 0x01, 0x07]
     dst_port: 60000
   app_param:
-    mode_sel: 0x30  #
+    mode_sel: 0x00  #
     test_mode_streams:
     - 0x0040003000200010
     - 0x0080007000600050
     - 0x00c000b000a00090
     - 0x010000f000e000d0
-    - 0x0  #
-    - 0x0  #
+    - 0x0140013001200110  #
+    - 0x0180017001600150  #
     - 0x01c001b001a00190
     - 0x020001f001e001d0
-    num_of_streams_sel: 0x01 #
+    num_of_streams_sel: 0x00 #
 
 
 mac:
@@ -174,7 +174,7 @@ xgbeid:
 packet_gap: 2000
 counter_wait: 639
 counter_sync: 10
-optical_delay: 0x11
+optical_delay: 0x29
 trig_out_delay: 5
 io_delay:
 - [0x04, 0x04, 0x04, 0x04]
@@ -193,16 +193,20 @@ io_delay:
 - [0x04, 0x04, 0x04, 0x04]
 - [0x04, 0x04, 0x04, 0x04]
 - [0x04, 0x04, 0x04, 0x04]
-#fft_shift: 0b001000100010
-fft_shift: 0b010010010010
-#fft_shift: 0b100000100000
+#fft_shift: 0b010010010010
+#fft_shift: 0b010101010101
+fft_shift:  0b100010001000
+#fft_shift:  0b100000100000
 #fft_shift:  0b000000000000
-truncation: 2
-#truncation: 1024
+truncation: 512
 #fft_shift: 0
 #truncation: 2
 master_board_id: 14
 src_mac: [0xec, 0x17, 0x2f, 0xc0, 0x5d, 0x70]
 src_ip: [100, 0, 0, 100]
+#ch_beg: 512
+#ch_end: 1536
 ch_beg: 368
 ch_end: 1680
+#ch_beg: 10
+#ch_end: 1034

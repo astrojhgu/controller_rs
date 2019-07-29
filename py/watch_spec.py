@@ -16,7 +16,7 @@ nboards=16
 ports_per_board=8
 nch=2048
 nports=nboards*ports_per_board
-
+fig_size=(40,20)
 def hide_tick_labels(ax, hide_x=False, hide_y=False):
     ticks = []
     if hide_x:
@@ -87,7 +87,7 @@ while True:
         print(ymin, ymax)
 
         plt.close()
-        fig=plt.figure(figsize=(40,20))
+        fig=plt.figure(figsize=fig_size)
         for j in range(nboards):
             print("ploting board {0}".format(j));
             for i in range(ports_per_board):
@@ -115,7 +115,7 @@ while True:
         print(ymin, ymax)
 
         plt.close()
-        fig=plt.figure(figsize=(40,20))
+        fig=plt.figure(figsize=fig_size)
         for j in range(nboards):
             print("ploting board {0}".format(j));
             for i in range(ports_per_board):
@@ -145,7 +145,7 @@ while True:
         ymax=max(ymax, abs(ymin))
         ymin=-ymax
         print(ymin,ymax)
-        fig=plt.figure(figsize=(40,20))
+        fig=plt.figure(figsize=fig_size)
 
         for j in range(nboards):
             print("ploting board {0}".format(j))
@@ -166,7 +166,7 @@ while True:
 
         #spec_data*=0.0
         plt.close()
-        fig=plt.figure(figsize=(40,20))
+        fig=plt.figure(figsize=fig_size)
         ymax=max(np.max(mean_fft_data.real),np.max(mean_fft_data.imag))
         ymin=min(np.min(mean_fft_data.real),np.min(mean_fft_data.imag))
         ymax*=1.1

@@ -60,17 +60,18 @@ snap2:
     dst_ip:  [0x0a, 0x00, 0x01, 0x07]
     dst_port: 60000
   app_param:
-    mode_sel: 0x30  #
+    mode_sel: 0x00  #
     test_mode_streams:
     - 0x0040003000200010
     - 0x0080007000600050
     - 0x00c000b000a00090
     - 0x010000f000e000d0
-    - 0x0  #
-    - 0x0  #
+    - 0x0140013001200110  #
+    - 0x0180017001600150  #
     - 0x01c001b001a00190
     - 0x020001f001e001d0
-    num_of_streams_sel: 0x01 #
+    num_of_streams_sel: 0x00 #
+
 
 
 mac:
@@ -193,12 +194,12 @@ io_delay:
 - [0x05, 0x05, 0x05, 0x05]
 - [0x05, 0x05, 0x05, 0x05]
 - [0x05, 0x05, 0x05, 0x05]
-fft_shift: 0b010010010010
+#fft_shift: 0b010010010010
 #fft_shift: 0b010101010101
-#fft_shift:  0b100010001000
-fft_shift:  0b100000100000
+fft_shift:  0b100010001000
+#fft_shift:  0b100000100000
 #fft_shift:  0b000000000000
-truncation: 2
+truncation: 512
 #fft_shift: 0
 #truncation: 2
 master_board_id: 14
