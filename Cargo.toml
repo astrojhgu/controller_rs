@@ -1,14 +1,14 @@
 [dependencies]
-etherparse = '0.8.0'
+chrono = '0.4.7'
+etherparse = '0.8.2'
 interfaces = '0.0.4'
-num-complex = '0.2.1'
+num-complex = '0.2.3'
 num-traits = '0.2.8'
 pnet = '0.22.0'
-serde_yaml = '0.8.8'
-chrono = '0.4.7'
+serde_yaml = '0.8.9'
 
 [dependencies.astroalgo]
-path="../astroalgo"
+path = '../astroalgo'
 
 [package]
 authors = ['Gu Junhua <jhgu@nao.cas.cn>']

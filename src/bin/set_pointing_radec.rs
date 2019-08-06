@@ -49,6 +49,7 @@ fn main() {
     let az=hzp.az.0;
     let ze=f64::PI()/2.0-hzp.alt.0;
 
+    eprintln!("now={:?}", now);
     eprintln!("az={} ze={}", az.to_degrees(), ze.to_degrees());
 
     let nx = ze.sin() * az.sin();
