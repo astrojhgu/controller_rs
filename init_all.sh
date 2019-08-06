@@ -7,3 +7,4 @@ done
 sleep 1
 sudo ./send_external_trig.py
 
+./set_pointing.sh
